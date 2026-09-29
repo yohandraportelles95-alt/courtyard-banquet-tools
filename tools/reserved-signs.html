@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Courtyard Luxury Banquet Tent Signs</title>
+
+<style>
+
+/* =========================================================
+   COURTYARD LUXURY BANQUET TENT SIGNS
+   Wedding | Corporate | VIP | Kids Seat
+   ========================================================= */
+
+*{
+    box-sizing:border-box;
+}
+
+:root{
+    --navy:#102f3b;
+    --navy2:#173d4b;
+    --deep:#082833;
+
+    --gold:#bd8939;
+    --gold2:#d8b66d;
+    --gold3:#936421;
+
+    --ivory:#fffaf0;
+    --cream:#f7efe1;
+    --champagne:#ead9b7;
+
+    --gray:#716960;
+}
+
+html,body{
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:#ebe8e1;
+    color:var(--navy);
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+
+/* =========================================================
+   EDITOR
+   ========================================================= */
+
+.editor{
+    background:#0c2d38;
+    color:white;
+    padding:20px 30px 24px;
+    box-shadow:0 4px 18px rgba(0,0,0,.2);
+}
+
+.editor-head{
+    max-width:1450px;
+    margin:0 auto 16px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.editor h1{
+    margin:0;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:26px;
+    font-weight:normal;
+}
+
+.collection{
+    color:#e4bd72;
+    font-size:10px;
+    font-weight:bold;
+    letter-spacing:3px;
+}
+
+.controls{
+    max-width:1450px;
+    margin:auto;
+
+    display:grid;
+    grid-template-columns:1.25fr 1.1fr 1.5fr auto auto;
+    gap:12px;
+    align-items:end;
+}
+
+.field label{
+    display:block;
+    margin-bottom:6px;
+
+    color:#efd397;
+
+    font-size:9px;
+    font-weight:bold;
+    letter-spacing:1.3px;
+}
+
+.field input,
+.field select{
+    width:100%;
+    height:40px;
+
+    padding:0 11px;
+
+    border:0;
+    border-radius:4px;
+
+    background:white;
+    color:#172f39;
+
+    font-size:13px;
+}
+
+button{
+    height:40px;
+    padding:0 20px;
+
+    border-radius:4px;
+
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.update{
+    border:0;
+    background:#c28e3a;
+    color:white;
+}
+
+.print{
+    background:white;
+    color:#17333f;
+    border:1px solid #c28e3a;
+}
+
+.help{
+    max-width:1450px;
+    margin:13px auto 0;
+
+    color:#d8e0e1;
+
+    font-size:10px;
+    line-height:1.55;
+}
+
+
+/* =========================================================
+   PREVIEW
+   ========================================================= */
+
+.preview{
+    padding:34px 20px 70px;
+}
+
+.preview-small{
+    text-align:center;
+    color:#b37d32;
+    font-size:9px;
+    letter-spacing:4px;
+}
+
+.preview h2{
+    margin:8px 0 27px;
+
+    text-align:center;
+
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:32px;
+    font-weight:normal;
+}
+
+.screen-sign{
+    width:min(900px,92vw);
+    aspect-ratio:7.5/4.75;
+
+    margin:auto;
+
+    box-shadow:
+        0 22px 48px rgba(27,33,35,.17);
+}
+
+
+/* =========================================================
+   COMMON SIGN
+   ========================================================= */
+
+.sign{
+    position:relative;
+
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+
+    background:#fffaf1;
+
+    color:var(--navy);
+}
+
+.sign *{
+    box-sizing:border-box;
+}
+
+
+/* subtle paper texture */
+
+.sign:after{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    pointer-events:none;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(80,60,30,.015) 0px,
+            rgba(80,60,30,.015) 1px,
+            transparent 1px,
+            transparent 4px
+        );
+
+    z-index:2;
+}
+
+
+/* =========================================================
+   COURTYARD WORDMARK
+   ========================================================= */
+
+.brand{
+    position:absolute;
+
+    top:34px;
+    left:0;
+
+    width:100%;
+
+    text-align:center;
+
+    z-index:15;
+}
+
+.brand-main{
+    color:#b98232;
+
+    font-size:21px;
+    font-weight:bold;
+
+    letter-spacing:6px;
+}
+
+.brand-sub{
+    margin-top:3px;
+
+    color:#1a2b31;
+
+    font-size:5px;
+    font-weight:bold;
+
+    letter-spacing:1.1px;
+}
+
+
+/* =========================================================
+   COMMON CENTER CONTENT
+   ========================================================= */
+
+.content{
+    position:absolute;
+
+    inset:100px 70px 45px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+
+    z-index:12;
+}
+
+.kicker{
+    margin-bottom:13px;
+
+    color:#a36e27;
+
+    font-size:9px;
+    font-weight:bold;
+
+    letter-spacing:5px;
+
+    text-transform:uppercase;
+}
+
+.main-title{
+    color:#102f3b;
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-size:58px;
+    font-weight:normal;
+
+    line-height:1;
+
+    letter-spacing:2px;
+}
+
+.second-line{
+    margin-top:19px;
+
+    color:#665f59;
+
+    font-size:10px;
+
+    letter-spacing:4px;
+
+    text-transform:uppercase;
+}
+
+.mini-divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:12px;
+
+    margin-top:23px;
+}
+
+.mini-divider span.line{
+    display:block;
+
+    width:80px;
+    height:1px;
+
+    background:#d2ad68;
+}
+
+.mini-divider span.gem{
+    display:block;
+
+    width:8px;
+    height:8px;
+
+    background:#b98232;
+
+    transform:rotate(45deg);
+}
+
+
+/* =========================================================
+   =========================================================
+   WEDDING
+   =========================================================
+   ========================================================= */
+
+.sign.wedding{
+    background:
+        radial-gradient(
+            ellipse at center,
+            #fffdf8 0%,
+            #fffaf0 55%,
+            #f8ecda 100%
+        );
+}
+
+
+/* wedding borders */
+
+.wedding-frame{
+    display:none;
+}
+
+.sign.wedding .wedding-frame{
+    display:block;
+
+    position:absolute;
+    inset:12px;
+
+    border:2px solid #b77d2d;
+
+    z-index:5;
+}
+
+.sign.wedding .wedding-frame:before{
+    content:"";
+
+    position:absolute;
+    inset:7px;
+
+    border:1px solid rgba(183,125,45,.68);
+}
+
+.sign.wedding .wedding-frame:after{
+    content:"";
+
+    position:absolute;
+    inset:13px;
+
+    border:1px solid rgba(183,125,45,.22);
+}
+
+
+/* wedding ornament */
+
+.wedding-corner{
+    display:none;
+}
+
+.sign.wedding .wedding-corner{
+    display:block;
+
+    position:absolute;
+
+    width:175px;
+    height:140px;
+
+    color:#b57d30;
+
+    z-index:7;
+}
+
+.sign.wedding .wedding-corner svg{
+    width:100%;
+    height:100%;
+}
+
+.sign.wedding .wedding-corner path{
+    fill:none;
+    stroke:currentColor;
+
+    stroke-width:2.1;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.sign.wedding .wedding-corner .leaf{
+    fill:currentColor;
+    stroke:none;
+}
+
+.wc-tl{
+    top:15px;
+    left:15px;
+}
+
+.wc-tr{
+    top:15px;
+    right:15px;
+    transform:scaleX(-1);
+}
+
+.wc-bl{
+    bottom:15px;
+    left:15px;
+    transform:scaleY(-1);
+}
+
+.wc-br{
+    right:15px;
+    bottom:15px;
+    transform:scale(-1);
+}
+
+
+/* wedding side curls */
+
+.wedding-side{
+    display:none;
+}
+
+.sign.wedding .wedding-side{
+    display:block;
+
+    position:absolute;
+
+    top:140px;
+
+    width:65px;
+    height:190px;
+
+    z-index:7;
+
+    opacity:.9;
+}
+
+.sign.wedding .wedding-side.left{
+    left:16px;
+}
+
+.sign.wedding .wedding-side.right{
+    right:16px;
+    transform:scaleX(-1);
+}
+
+.sign.wedding .wedding-side svg{
+    width:100%;
+    height:100%;
+}
+
+.sign.wedding .wedding-side path{
+    fill:none;
+
+    stroke:#c38d42;
+
+    stroke-width:2;
+
+    stroke-linecap:round;
+}
+
+
+/* wedding logo */
+
+.sign.wedding .brand{
+    top:42px;
+}
+
+.sign.wedding .brand-main{
+    font-size:13px;
+    letter-spacing:5px;
+}
+
+.sign.wedding .brand-sub{
+    font-size:4px;
+}
+
+
+/* wedding content */
+
+.sign.wedding .content{
+    inset:95px 120px 45px;
+}
+
+.sign.wedding .kicker{
+    margin-bottom:9px;
+
+    color:#9b7445;
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-size:12px;
+    font-weight:normal;
+    font-style:italic;
+
+    letter-spacing:1px;
+
+    text-transform:none;
+}
+
+.sign.wedding .main-title{
+    color:#9c6812;
+
+    font-family:
+        "Segoe Script",
+        "Lucida Handwriting",
+        "Brush Script MT",
+        cursive;
+
+    font-size:65px;
+
+    letter-spacing:-3px;
+
+    text-transform:none;
+}
+
+.sign.wedding .second-line{
+    margin-top:13px;
+
+    color:#695346;
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-size:12px;
+    font-style:italic;
+
+    letter-spacing:2px;
+
+    text-transform:none;
+}
+
+
+/* =========================================================
+   =========================================================
+   CORPORATE
+   =========================================================
+   ========================================================= */
+
+.sign.corporate{
+    background:
+        linear-gradient(
+            135deg,
+            #fffdf8 0%,
+            #faf5eb 50%,
+            #fffdf9 100%
+        );
+}
+
+
+/* architectural corporate frame */
+
+.corp-frame{
+    display:none;
+}
+
+.sign.corporate .corp-frame{
+    display:block;
+
+    position:absolute;
+
+    inset:13px;
+
+    border:2px solid #c28c3a;
+
+    z-index:5;
+}
+
+.sign.corporate .corp-frame:before{
+    content:"";
+
+    position:absolute;
+
+    inset:8px;
+
+    border:1px solid #dfc28d;
+}
+
+.sign.corporate .corp-frame:after{
+    content:"";
+
+    position:absolute;
+
+    left:38px;
+    right:38px;
+    top:28px;
+
+    height:1px;
+
+    background:
+        linear-gradient(
+            to right,
+            transparent,
+            #d7b676 20%,
+            #d7b676 80%,
+            transparent
+        );
+}
+
+
+/* corporate navy side accents */
+
+.corp-accent{
+    display:none;
+}
+
+.sign.corporate .corp-accent{
+    display:block;
+
+    position:absolute;
+
+    top:0;
+    bottom:0;
+
+    width:14px;
+
+    background:#123845;
+
+    z-index:4;
+}
+
+.sign.corporate .corp-accent.left{
+    left:0;
+}
+
+.sign.corporate .corp-accent.right{
+    right:0;
+}
+
+
+/* corner brackets */
+
+.corp-corner{
+    display:none;
+}
+
+.sign.corporate .corp-corner{
+    display:block;
+
+    position:absolute;
+
+    width:33px;
+    height:33px;
+
+    z-index:7;
+}
+
+.sign.corporate .corp-corner:before,
+.sign.corporate .corp-corner:after{
+    content:"";
+
+    position:absolute;
+
+    background:#b98232;
+}
+
+.sign.corporate .corp-corner:before{
+    width:33px;
+    height:2px;
+}
+
+.sign.corporate .corp-corner:after{
+    width:2px;
+    height:33px;
+}
+
+.cc-tl{
+    top:29px;
+    left:32px;
+}
+
+.cc-tr{
+    top:29px;
+    right:32px;
+    transform:rotate(90deg);
+}
+
+.cc-br{
+    right:32px;
+    bottom:29px;
+    transform:rotate(180deg);
+}
+
+.cc-bl{
+    left:32px;
+    bottom:29px;
+    transform:rotate(270deg);
+}
+
+
+/* corporate watermark */
+
+.corp-watermark{
+    display:none;
+}
+
+.sign.corporate .corp-watermark{
+    display:block;
+
+    position:absolute;
+
+    width:270px;
+    height:270px;
+
+    right:-40px;
+    bottom:-65px;
+
+    border:1px solid rgba(184,137,63,.08);
+    border-radius:50%;
+
+    z-index:3;
+}
+
+.sign.corporate .corp-watermark:before{
+    content:"";
+
+    position:absolute;
+
+    inset:35px;
+
+    border:1px solid rgba(184,137,63,.07);
+
+    transform:rotate(45deg);
+}
+
+.sign.corporate .brand{
+    top:39px;
+}
+
+.sign.corporate .content{
+    inset:95px 100px 45px;
+}
+
+.sign.corporate .kicker{
+    color:#b37b2e;
+
+    font-size:8px;
+
+    letter-spacing:6px;
+}
+
+.sign.corporate .main-title{
+    font-size:62px;
+
+    letter-spacing:4px;
+}
+
+.sign.corporate .second-line{
+    font-size:9px;
+
+    letter-spacing:6px;
+}
+
+
+/* =========================================================
+   =========================================================
+   VIP
+   =========================================================
+   ========================================================= */
+
+.sign.vip{
+    background:
+        radial-gradient(
+            circle at 73% 32%,
+            rgba(255,255,255,.14),
+            transparent 25%
+        ),
+        linear-gradient(
+            135deg,
+            #082b36 0%,
+            #103d49 52%,
+            #082733 100%
+        );
+
+    color:white;
+}
+
+
+/* VIP outer gold */
+
+.vip-frame{
+    display:none;
+}
+
+.sign.vip .vip-frame{
+    display:block;
+
+    position:absolute;
+
+    inset:11px;
+
+    border:2px solid #c89642;
+
+    z-index:5;
+}
+
+.sign.vip .vip-frame:before{
+    content:"";
+
+    position:absolute;
+
+    inset:7px;
+
+    border:1px solid rgba(234,205,145,.65);
+}
+
+.sign.vip .vip-frame:after{
+    content:"";
+
+    position:absolute;
+
+    inset:14px;
+
+    border:1px solid rgba(201,151,68,.28);
+}
+
+
+/* VIP large V watermark */
+
+.vip-watermark{
+    display:none;
+}
+
+.sign.vip .vip-watermark{
+    display:block;
+
+    position:absolute;
+
+    left:50%;
+    top:48%;
+
+    transform:translate(-50%,-50%);
+
+    color:rgba(255,255,255,.025);
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-size:360px;
+    line-height:1;
+
+    z-index:3;
+}
+
+
+/* VIP top/bottom gold plates */
+
+.vip-plate{
+    display:none;
+}
+
+.sign.vip .vip-plate{
+    display:block;
+
+    position:absolute;
+
+    left:50%;
+
+    width:220px;
+    height:3px;
+
+    transform:translateX(-50%);
+
+    background:
+        linear-gradient(
+            to right,
+            transparent,
+            #e3c17d,
+            #b97f2c,
+            #e3c17d,
+            transparent
+        );
+
+    z-index:8;
+}
+
+.sign.vip .vip-plate.top{
+    top:92px;
+}
+
+.sign.vip .vip-plate.bottom{
+    bottom:55px;
+}
+
+
+/* VIP corner diamonds */
+
+.vip-diamond{
+    display:none;
+}
+
+.sign.vip .vip-diamond{
+    display:block;
+
+    position:absolute;
+
+    width:10px;
+    height:10px;
+
+    background:#d0a253;
+
+    transform:rotate(45deg);
+
+    z-index:8;
+}
+
+.sign.vip .vip-diamond.d1{
+    top:34px;
+    left:35px;
+}
+
+.sign.vip .vip-diamond.d2{
+    top:34px;
+    right:35px;
+}
+
+.sign.vip .vip-diamond.d3{
+    bottom:34px;
+    left:35px;
+}
+
+.sign.vip .vip-diamond.d4{
+    bottom:34px;
+    right:35px;
+}
+
+
+.sign.vip .brand-main{
+    color:#e2bc72;
+}
+
+.sign.vip .brand-sub{
+    color:#f2e4c5;
+}
+
+.sign.vip .kicker{
+    color:#d9ad5c;
+
+    letter-spacing:7px;
+}
+
+.sign.vip .main-title{
+    color:#fffaf0;
+
+    font-size:62px;
+
+    letter-spacing:5px;
+
+    text-shadow:
+        0 2px 12px rgba(0,0,0,.18);
+}
+
+.sign.vip .second-line{
+    color:#e8d5b0;
+
+    letter-spacing:6px;
+}
+
+.sign.vip .mini-divider span.line{
+    background:#b9893c;
+}
+
+.sign.vip .mini-divider span.gem{
+    background:#e0ba70;
+}
+
+
+/* =========================================================
+   =========================================================
+   KIDS SEAT
+   =========================================================
+   ========================================================= */
+
+.sign.kids{
+    background:
+        radial-gradient(
+            circle at 50% 50%,
+            #fffdf8,
+            #fbf4e7
+        );
+}
+
+
+/* kids elegant frame */
+
+.kids-frame{
+    display:none;
+}
+
+.sign.kids .kids-frame{
+    display:block;
+
+    position:absolute;
+
+    inset:13px;
+
+    border:2px solid #d0a557;
+
+    border-radius:10px;
+
+    z-index:5;
+}
+
+.sign.kids .kids-frame:before{
+    content:"";
+
+    position:absolute;
+
+    inset:8px;
+
+    border:1px solid #ead8b5;
+
+    border-radius:7px;
+}
+
+
+/* kids balloons */
+
+.balloon-set{
+    display:none;
+}
+
+.sign.kids .balloon-set{
+    display:block;
+
+    position:absolute;
+
+    width:90px;
+    height:135px;
+
+    z-index:6;
+}
+
+.balloon-set.left{
+    left:45px;
+    bottom:45px;
+}
+
+.balloon-set.right{
+    right:45px;
+    top:65px;
+
+    transform:scaleX(-1);
+}
+
+.balloon{
+    position:absolute;
+
+    width:35px;
+    height:46px;
+
+    border-radius:50% 50% 47% 47%;
+
+    border:2px solid;
+}
+
+.balloon:after{
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+    top:44px;
+
+    width:1px;
+    height:60px;
+
+    background:#c5b18b;
+
+    transform-origin:top;
+
+    transform:rotate(7deg);
+}
+
+.balloon.b1{
+    left:5px;
+    top:8px;
+
+    border-color:#b98232;
+
+    background:rgba(185,130,50,.06);
+}
+
+.balloon.b2{
+    left:37px;
+    top:25px;
+
+    border-color:#4f7883;
+
+    background:rgba(79,120,131,.05);
+}
+
+.balloon.b3{
+    left:19px;
+    top:55px;
+
+    border-color:#d2b16e;
+
+    background:rgba(210,177,110,.07);
+}
+
+
+/* stars */
+
+.kids-sparkles{
+    display:none;
+}
+
+.sign.kids .kids-sparkles{
+    display:block;
+
+    position:absolute;
+    inset:0;
+
+    z-index:6;
+
+    pointer-events:none;
+}
+
+.spark{
+    position:absolute;
+
+    color:#c18e3d;
+}
+
+.spark.a{
+    left:145px;
+    top:115px;
+
+    font-size:20px;
+}
+
+.spark.b{
+    right:145px;
+    bottom:105px;
+
+    font-size:16px;
+}
+
+.spark.c{
+    right:115px;
+    top:170px;
+
+    font-size:10px;
+}
+
+.spark.d{
+    left:115px;
+    bottom:150px;
+
+    font-size:11px;
+}
+
+
+.sign.kids .brand{
+    top:40px;
+}
+
+.sign.kids .content{
+    inset:100px 130px 50px;
+}
+
+.sign.kids .kicker{
+    color:#bd8a39;
+
+    letter-spacing:4px;
+}
+
+.sign.kids .main-title{
+    color:#173b46;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:60px;
+
+    letter-spacing:1px;
+
+    text-transform:none;
+}
+
+.sign.kids .second-line{
+    color:#776b5e;
+
+    letter-spacing:4px;
+}
+
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+#printSheet{
+    display:none;
+}
+
+@page{
+    size:Letter portrait;
+    margin:0;
+}
+
+@media print{
+
+    html,
+    body{
+        width:8.5in;
+        height:11in;
+
+        margin:0 !important;
+        padding:0 !important;
+
+        background:white !important;
+
+        -webkit-print-color-adjust:exact !important;
+        print-color-adjust:exact !important;
+    }
+
+    .editor,
+    .preview{
+        display:none !important;
+    }
+
+    #printSheet{
+        display:block !important;
+
+        position:relative;
+
+        width:8.5in;
+        height:11in;
+
+        overflow:hidden;
+
+        background:white;
+    }
+
+    /*
+       COMPLETE TENT:
+       7.5 x 9.5
+
+       EACH SIDE:
+       7.5 x 4.75
+    */
+
+    .tent{
+        position:absolute;
+
+        left:.5in;
+        top:.75in;
+
+        width:7.5in;
+        height:9.5in;
+    }
+
+    .face{
+        position:absolute;
+
+        left:0;
+
+        width:7.5in;
+        height:4.75in;
+
+        overflow:hidden;
+    }
+
+    .face.top{
+        top:0;
+
+        transform:rotate(180deg);
+    }
+
+    .face.bottom{
+        top:4.75in;
+    }
+
+    .face .sign{
+        width:7.5in;
+        height:4.75in;
+    }
+
+
+    /* fold */
+
+    .fold{
+        position:absolute;
+
+        left:-.18in;
+        top:4.75in;
+
+        width:7.86in;
+
+        border-top:1px dashed #777;
+
+        z-index:50;
+    }
+
+    .fold-text{
+        position:absolute;
+
+        left:50%;
+        top:4.75in;
+
+        transform:translate(-50%,-50%);
+
+        padding:0 9px;
+
+        background:white;
+        color:#777;
+
+        font:7px Arial;
+
+        letter-spacing:2px;
+
+        z-index:51;
+    }
+
+
+    /* crop marks */
+
+    .crop{
+        position:absolute;
+
+        width:.20in;
+        height:.20in;
+
+        z-index:60;
+    }
+
+    .crop:before,
+    .crop:after{
+        content:"";
+
+        position:absolute;
+
+        background:#555;
+    }
+
+    .crop:before{
+        width:.20in;
+        height:.5px;
+
+        top:.10in;
+    }
+
+    .crop:after{
+        width:.5px;
+        height:.20in;
+
+        left:.10in;
+    }
+
+    .crop.tl{
+        left:-.25in;
+        top:-.25in;
+    }
+
+    .crop.tr{
+        right:-.25in;
+        top:-.25in;
+
+        transform:rotate(90deg);
+    }
+
+    .crop.br{
+        right:-.25in;
+        bottom:-.25in;
+
+        transform:rotate(180deg);
+    }
+
+    .crop.bl{
+        left:-.25in;
+        bottom:-.25in;
+
+        transform:rotate(270deg);
+    }
+
+}
+
+</style>
+<link rel="stylesheet" href="../assets/refinements.css?v=4">
+</head>
+
+
+<body>
+
+
+<!-- =======================================================
+     EDITOR
+     ======================================================= -->
+
+<section class="editor">
+
+<div class="editor-head">
+
+    <h1>
+        Luxury Banquet Tent Signs
+    </h1>
+
+    <div class="collection">
+        COURTYARD • BANQUET COLLECTION
+    </div>
+
+</div>
+
+
+<div class="controls">
+
+    <div class="field">
+
+        <label>
+            SIGN COLLECTION
+        </label>
+
+        <select id="style">
+
+            <option value="wedding">
+                Wedding — Ornate & Elegant
+            </option>
+
+            <option value="corporate">
+                Corporate — Modern Luxury
+            </option>
+
+            <option value="vip">
+                VIP — Executive Luxury
+            </option>
+
+            <option value="kids">
+                Kids — Elegant & Playful
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            MAIN TEXT
+        </label>
+
+        <input
+            id="mainText"
+            value="Reserved">
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            CUSTOM SECOND LINE
+        </label>
+
+        <input
+            id="secondText"
+            value="Bride & Groom's Family">
+    </div>
+
+
+    <button
+        class="update"
+        onclick="updateSign()">
+
+        Update Sign
+
+    </button>
+
+
+    <button
+        class="print"
+        onclick="window.print()">
+
+        Print / Save PDF
+
+    </button>
+
+</div>
+
+
+<div class="help">
+
+Wedding is intentionally romantic and ornate. Corporate uses a clean architectural design, VIP uses a deep executive navy-and-gold treatment, and Kids uses a softer upscale celebration design. All wording is editable. Print on Letter 8.5 × 11 cardstock at 100% / Actual Size with Background Graphics ON.
+
+</div>
+
+</section>
+
+
+<!-- =======================================================
+     PREVIEW
+     ======================================================= -->
+
+<section class="preview">
+
+<div class="preview-small">
+    LIVE PREVIEW
+</div>
+
+<h2 id="previewTitle">
+    Wedding Reserved Seating
+</h2>
+
+<div
+    class="screen-sign"
+    id="screenSign">
+</div>
+
+</section>
+
+
+<!-- =======================================================
+     PRINT SHEET
+     ======================================================= -->
+
+<div id="printSheet">
+
+<div class="tent">
+
+    <div class="crop tl"></div>
+    <div class="crop tr"></div>
+    <div class="crop br"></div>
+    <div class="crop bl"></div>
+
+    <div
+        class="face top"
+        id="topFace">
+    </div>
+
+    <div class="fold"></div>
+
+    <div class="fold-text">
+        FOLD HERE
+    </div>
+
+    <div
+        class="face bottom"
+        id="bottomFace">
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+
+/* =========================================================
+   DEFAULT COLLECTIONS
+   ========================================================= */
+
+const presets={
+
+    wedding:{
+        main:"Reserved",
+        second:"Bride & Groom's Family",
+        kicker:"With love, this seat is reserved for",
+        title:"Wedding Reserved Seating"
+    },
+
+    corporate:{
+        main:"RESERVED",
+        second:"FOR OUR VALUED GUESTS",
+        kicker:"COURTYARD CARROLLTON WELCOMES",
+        title:"Corporate Reserved Seating"
+    },
+
+    vip:{
+        main:"VIP RESERVED",
+        second:"WITH OUR COMPLIMENTS",
+        kicker:"DISTINGUISHED GUEST",
+        title:"VIP Reserved Seating"
+    },
+
+    kids:{
+        main:"Kids Seat",
+        second:"LITTLE GUEST • BIG WELCOME",
+        kicker:"A SPECIAL PLACE FOR",
+        title:"Kids Reserved Seat"
+    }
+
+};
+
+
+/* =========================================================
+   WEDDING CORNER SVG
+   ========================================================= */
+
+function weddingCorner(position){
+
+return `
+
+<div class="wedding-corner ${position}">
+
+<svg viewBox="0 0 180 145">
+
+    <path d="
+        M6 136
+        C18 105,18 81,40 69
+        C59 59,78 68,73 86
+        C69 100,50 105,42 93
+        C35 82,44 72,54 76
+        C64 80,61 91,54 91
+    "/>
+
+    <path d="
+        M39 70
+        C34 45,48 24,72 27
+        C94 29,101 47,90 58
+        C79 68,65 61,67 49
+        C69 39,81 37,86 45
+    "/>
+
+    <path d="
+        M71 28
+        C100 20,121 31,140 20
+        C151 13,161 9,173 12
+    "/>
+
+    <path d="
+        M69 108
+        C98 113,116 94,108 74
+        C101 56,109 44,125 45
+        C140 47,145 61,136 72
+    "/>
+
+    <path
+        class="leaf"
+        d="
+        M29 102
+        C17 94,16 82,21 75
+        C33 80,37 90,29 102Z
+    "/>
+
+    <path
+        class="leaf"
+        d="
+        M49 63
+        C39 54,40 42,47 35
+        C58 43,60 54,49 63Z
+    "/>
+
+    <path
+        class="leaf"
+        d="
+        M82 29
+        C87 16,98 12,107 15
+        C104 27,95 33,82 29Z
+    "/>
+
+    <path
+        class="leaf"
+        d="
+        M98 91
+        C111 83,121 86,127 95
+        C116 103,106 102,98 91Z
+    "/>
+
+    <path
+        class="leaf"
+        d="
+        M111 50
+        C117 37,129 34,137 39
+        C131 51,121 55,111 50Z
+    "/>
+
+    <path d="
+        M43 109
+        C35 101,28 107,33 114
+        C25 116,30 124,39 120
+        C38 130,49 130,49 120
+        C57 125,62 117,53 114
+        C59 106,50 102,43 109
+    "/>
+
+</svg>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================================
+   WEDDING SIDE CURL
+   ========================================================= */
+
+function weddingSide(side){
+
+return `
+
+<div class="wedding-side ${side}">
+
+<svg viewBox="0 0 70 190">
+
+    <path d="
+        M54 3
+        C28 30,29 52,49 67
+        C64 78,64 97,48 106
+        C28 117,26 140,44 184
+    "/>
+
+    <path d="
+        M46 38
+        C26 34,18 46,24 58
+        C30 69,42 68,46 58
+    "/>
+
+    <path d="
+        M48 109
+        C63 119,65 134,56 143
+        C47 153,35 148,34 137
+    "/>
+
+</svg>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================================
+   KIDS BALLOONS
+   ========================================================= */
+
+function balloons(side){
+
+return `
+
+<div class="balloon-set ${side}">
+
+    <div class="balloon b1"></div>
+    <div class="balloon b2"></div>
+    <div class="balloon b3"></div>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================================
+   SIGN
+   ========================================================= */
+
+function makeSign(type,main,second,kicker){
+
+return `
+
+<div class="sign ${type}">
+
+
+    <!-- WEDDING ONLY -->
+
+    <div class="wedding-frame"></div>
+
+    ${weddingCorner("wc-tl")}
+    ${weddingCorner("wc-tr")}
+    ${weddingCorner("wc-bl")}
+    ${weddingCorner("wc-br")}
+
+    ${weddingSide("left")}
+    ${weddingSide("right")}
+
+
+    <!-- CORPORATE ONLY -->
+
+    <div class="corp-frame"></div>
+
+    <div class="corp-accent left"></div>
+    <div class="corp-accent right"></div>
+
+    <div class="corp-corner cc-tl"></div>
+    <div class="corp-corner cc-tr"></div>
+    <div class="corp-corner cc-br"></div>
+    <div class="corp-corner cc-bl"></div>
+
+    <div class="corp-watermark"></div>
+
+
+    <!-- VIP ONLY -->
+
+    <div class="vip-frame"></div>
+
+    <div class="vip-watermark">
+        V
+    </div>
+
+    <div class="vip-plate top"></div>
+    <div class="vip-plate bottom"></div>
+
+    <div class="vip-diamond d1"></div>
+    <div class="vip-diamond d2"></div>
+    <div class="vip-diamond d3"></div>
+    <div class="vip-diamond d4"></div>
+
+
+    <!-- KIDS ONLY -->
+
+    <div class="kids-frame"></div>
+
+    ${balloons("left")}
+    ${balloons("right")}
+
+    <div class="kids-sparkles">
+
+        <span class="spark a">✦</span>
+        <span class="spark b">✦</span>
+        <span class="spark c">✦</span>
+        <span class="spark d">✦</span>
+
+    </div>
+
+
+    <!-- BRAND -->
+
+    <div class="brand">
+
+        <img class="official-logo" src="../assets/branding/courtyard-logo.webp" alt="Courtyard by Marriott">
+
+    </div>
+
+
+    <!-- CENTER -->
+
+    <div class="content">
+
+        <div class="kicker">
+            ${kicker}
+        </div>
+
+        <div class="main-title">
+            ${main}
+        </div>
+
+        <div class="second-line">
+            ${second}
+        </div>
+
+        <div class="mini-divider">
+
+            <span class="line"></span>
+
+            <span class="gem"></span>
+
+            <span class="line"></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================================
+   CHANGE COLLECTION
+   ========================================================= */
+
+document
+.getElementById("style")
+.addEventListener(
+    "change",
+    function(){
+
+        const p=presets[this.value];
+
+        document
+        .getElementById("mainText")
+        .value=p.main;
+
+        document
+        .getElementById("secondText")
+        .value=p.second;
+
+        updateSign();
+
+    }
+);
+
+
+/* =========================================================
+   UPDATE
+   ========================================================= */
+
+function updateSign(){
+
+    const type=
+        document
+        .getElementById("style")
+        .value;
+
+
+    const main=
+        document
+        .getElementById("mainText")
+        .value
+        .trim();
+
+
+    const second=
+        document
+        .getElementById("secondText")
+        .value
+        .trim();
+
+
+    const p=
+        presets[type];
+
+
+    const sign=
+        makeSign(
+            type,
+            main,
+            second,
+            p.kicker
+        );
+
+
+    document
+    .getElementById("screenSign")
+    .innerHTML=sign;
+
+
+    document
+    .getElementById("topFace")
+    .innerHTML=sign;
+
+
+    document
+    .getElementById("bottomFace")
+    .innerHTML=sign;
+
+
+    document
+    .getElementById("previewTitle")
+    .textContent=p.title;
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+updateSign();
+
+</script>
+
+<script src="../assets/print-options.js?v=3"></script>
+</body>
+</html>

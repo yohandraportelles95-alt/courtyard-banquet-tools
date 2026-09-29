@@ -1,0 +1,20 @@
+/* Shared physical geometry for both approved coupon generators.
+   Master artwork remains 600 × 390. Finished card: 3.60 × 2.34 inches.
+   Symmetric sheet: x=.51/4.39; y=1.71/4.33/6.95 inches. */
+.studio-nav{padding:14px 28px;background:#213e4f}.studio-nav a{color:#fff;text-decoration:none;font:14px Arial}
+.duplex-help{font:13px/1.5 Arial;margin-top:20px;color:#fff;max-width:900px}.duplex-help select{display:block;max-width:260px;margin-top:5px}.duplex-help p{margin-bottom:0}
+.print-page{grid-template-columns:repeat(2,3.60in);grid-template-rows:repeat(3,2.34in);column-gap:.28in;row-gap:.28in;justify-content:center;align-content:center;padding:0;box-sizing:border-box;break-inside:avoid}
+.print-page:last-child{page-break-after:auto;break-after:auto}
+/* Keep the approved back copy inside the unchanged card boundary at print size. */
+.print-coupon-shell .back-content{padding:24px 66px 16px}
+.print-coupon-shell .back-title{margin-top:14px}
+.print-coupon-shell .back-team,.print-coupon-shell .back-group,.print-coupon-shell .back-wish,.print-coupon-shell .back-custom{margin-top:12px}
+.print-coupon-shell .back-content .gold-divider,.print-coupon-shell .back-content .small-divider{margin:12px auto}
+.ink-saver .front-photo,.ink-saver .front-watermark,.ink-saver .back-photo-watermark,.ink-saver .back-watermark{display:none!important}
+.ink-saver .coupon{--photo:none!important}
+.ink-saver .front-curve{display:none}
+.ink-saver .coupon-front{background:#fcf8ef}
+.ink-saver .crest{background:#213e4f}
+.ink-saver .front-team,.ink-saver .left-details{color:#213e4f;text-shadow:none}
+@page{size:Letter portrait;margin:0}
+@media print{.studio-nav{display:none!important}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.print-page{width:8.5in!important;height:11in!important;margin:0!important;break-inside:avoid!important}.print-slot,.print-coupon-shell{width:3.60in!important;height:2.34in!important}}

@@ -1,0 +1,54 @@
+/* Shared, user-supplied transparent logo. No redrawing or recoloring. */
+.official-logo{display:inline-block;width:190px;max-width:100%;height:auto;object-fit:contain;vertical-align:middle}
+.coupon .brand,.coupon .back-brand{line-height:1;letter-spacing:normal}
+.coupon .brand .official-logo{width:178px}
+.coupon .back-brand .official-logo{width:190px}
+.sign .brand .official-logo{width:205px}
+.directory .official-logo{width:205px}
+.sign.social .brand .official-logo,.sign.vip .brand .official-logo{background:transparent;padding:0;border-radius:0}
+.courtyard .official-logo{width:145px}
+.buffet-brand .official-logo{width:105px}
+.buffet-brand{margin-bottom:13px;line-height:1}
+.buffet-name{font-size:29px;line-height:1.08;font-weight:normal;overflow-wrap:normal}
+.buffet-description{font-size:11px;line-height:1.2;color:#514b42;margin-top:8px}
+.buffet-eyebrow{font-size:7px;letter-spacing:1.15px;margin-bottom:6px}
+.buffet-info{padding:.13in .09in}
+.print-mode-panel{padding:14px 0;margin-top:15px;border-top:1px solid #b9ab8966;font:13px/1.4 Arial,sans-serif}
+.print-mode-panel label{display:block;margin:0 0 6px;font-weight:bold}
+.print-mode-panel select{padding:9px;max-width:280px;width:100%;background:#fff;color:#233a40;border:1px solid #bdbbb0;border-radius:3px}
+.print-mode-panel p{font-size:11px;opacity:.8;margin:7px 0 0}
+/* Botanical detailing coordinates with the approved wedding reserved signs. */
+.sign.bar.wedding,.sign.door.wedding{border:1px solid #b79a62;box-shadow:inset 0 0 0 7px #fffaf0,inset 0 0 0 8px #cdbb98;background:radial-gradient(ellipse at 50% 0,#fffefb 0,#fbf5e9 85%);color:#624c32}
+.sign.bar.wedding:before,.sign.door.wedding:before,.sign.bar.wedding:after,.sign.door.wedding:after{content:'';width:1.65in;height:1.33in;position:absolute;left:10px;top:10px;background:url('branding/wedding-botanical.svg') center/contain no-repeat;pointer-events:none}
+.sign.bar.wedding:after,.sign.door.wedding:after{left:auto;top:auto;right:10px;bottom:10px;transform:rotate(180deg)}
+.bar.wedding{padding:.55in .46in}
+.bar.wedding h2{font-family:Georgia,'Times New Roman',serif;font-size:43px;letter-spacing:.035em;font-weight:normal;margin:28px 0 12px}
+.wedding .subtitle,.door.wedding .second{font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#8e744c}
+.bar.wedding .subtitle{font-size:19px}
+.bar.wedding .drink-list{justify-content:center;gap:24px;margin-top:34px}
+.bar.wedding .drink{padding:6px 0}
+.bar.wedding .category{font-size:10px;letter-spacing:.23em;margin:10px 0 18px;padding:0 0 13px;border-bottom:1px solid #c9b68e}
+.bar.wedding .drink-name{font-size:1.06em}
+.bar.wedding .description{font-family:Georgia,serif;font-style:italic;margin-top:7px}
+.door.wedding h2{font-family:Georgia,serif;font-style:italic;line-height:1.16}
+.door.wedding{gap:38px}
+/* Transparent brand artwork sits directly on every design. */
+.official-logo{background:transparent!important;border:0!important;box-shadow:none!important}
+/* Classic editorial typography for bar menus, using locally available fonts. */
+.bar h2,.bar.wedding h2{font-family:'Baskerville','Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;font-weight:400;font-size:42px;line-height:1.15;letter-spacing:.06em}
+.bar .drink-name{font-family:'Baskerville','Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;font-weight:400;letter-spacing:.015em}
+.bar .subtitle,.bar .description{font-family:'Baskerville','Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;font-style:italic;line-height:1.35}
+.bar .subtitle{font-size:20px}
+.bar .description{font-size:.78em}
+.bar .category{letter-spacing:.2em;font-size:10px}
+/* White stock, lighter ornament and reduced background coverage. */
+.ink-saver .sign,.ink-saver .directory,.ink-saver .table-design,.ink-saver .buffet-card,.ink-saver .buffet-info{background:#fff!important;color:#24383b!important;box-shadow:none!important}
+.ink-saver .sign.social{border:2px solid #a58b57}
+.ink-saver .sign.bar.wedding,.ink-saver .sign.door.wedding{border:1px solid #baa67d}
+.ink-saver .sign.bar.wedding:before,.ink-saver .sign.bar.wedding:after,.ink-saver .sign.door.wedding:before,.ink-saver .sign.door.wedding:after{opacity:.55}
+.ink-saver .sign.wedding .wedding-frame,.ink-saver .sign.wedding .wedding-side,.ink-saver .sign .corp-watermark,.ink-saver .sign .vip-watermark,.ink-saver .sign .vip-plate{background:none!important;opacity:.4}
+.ink-saver .sign .content,.ink-saver .sign .main-title,.ink-saver .sign .second-line,.ink-saver .sign .kicker{color:#293c40!important;text-shadow:none!important}
+.ink-saver .sign .corp-accent,.ink-saver .sign .vip-plate{display:none}
+.ink-saver .color-panel,.ink-saver .buffet-color{background:white!important;color:var(--meal)!important;border-right:1px solid var(--meal)}
+.ink-saver .color-panel:after,.ink-saver .buffet-color:after{border-color:var(--meal)!important}
+@media print{.print-mode-panel{display:none!important}.official-logo{print-color-adjust:exact;-webkit-print-color-adjust:exact}}

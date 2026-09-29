@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courtyard Banquet Meal Card Studio</title>
+
+<style>
+:root{
+  --navy:#12313d;
+  --navy2:#294955;
+  --ivory:#f8f4eb;
+  --paper:#fffdf8;
+  --ink:#17313b;
+  --gold:#bd8d3c;
+  --gold2:#d8b86f;
+  --grey:#7c756d;
+}
+
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  padding:0;
+}
+
+body{
+  background:#ebe8e1;
+  color:#292521;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+/* =========================================================
+   TOP CONTROL PANEL
+========================================================= */
+
+.controls{
+  background:var(--navy);
+  color:white;
+  padding:20px 30px 22px;
+  box-shadow:0 4px 15px rgba(0,0,0,.15);
+}
+
+.topline{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  align-items:flex-start;
+}
+
+h1{
+  margin:0;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:25px;
+  font-weight:400;
+}
+
+.subtitle{
+  margin-top:5px;
+  color:#d9d5cc;
+  font-size:11px;
+}
+
+.master{
+  color:#e6c170;
+  font-size:9px;
+  font-weight:bold;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  padding-top:5px;
+}
+
+/* MODES */
+
+.modebar{
+  display:flex;
+  gap:9px;
+  margin:18px 0;
+}
+
+.modebutton{
+  background:#244754;
+  color:white;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:4px;
+  padding:10px 18px;
+  font-weight:bold;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.modebutton.active{
+  background:var(--gold);
+  border-color:var(--gold);
+}
+
+/* SELECTOR TITLE */
+
+.selector-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:9px;
+}
+
+.selector-heading span{
+  color:#e6c170;
+  font-size:9px;
+  font-weight:bold;
+  letter-spacing:2px;
+}
+
+.small-buttons{
+  display:flex;
+  gap:7px;
+}
+
+.small-buttons button{
+  background:transparent;
+  border:1px solid rgba(255,255,255,.28);
+  color:white;
+  padding:6px 10px;
+  border-radius:3px;
+  cursor:pointer;
+  font-size:10px;
+}
+
+/* MEAL SELECTORS */
+
+.meal-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+
+.meal-choice{
+  background:#294955;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:5px;
+  padding:10px;
+}
+
+.choice-title{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.choice-title input{
+  accent-color:var(--gold);
+  width:15px;
+  height:15px;
+}
+
+.swatch{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  flex:none;
+}
+
+.choice-name{
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+}
+
+.quantity{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+}
+
+.quantity label{
+  font-size:8px;
+  color:#d6d3ce;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.quantity input{
+  width:62px;
+  height:28px;
+  border:0;
+  border-radius:3px;
+  padding:4px 7px;
+  font-size:12px;
+}
+
+/* ACTIONS */
+
+.actions{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:15px;
+}
+
+.gold-button,
+.white-button{
+  padding:11px 18px;
+  border:0;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.gold-button{
+  background:var(--gold);
+  color:white;
+}
+
+.white-button{
+  background:white;
+  color:var(--navy);
+}
+
+.summary{
+  margin-left:auto;
+  color:#ddd8ce;
+  font-size:10px;
+  line-height:1.5;
+}
+
+.summary strong{
+  color:#e6c170;
+}
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+.preview-area{
+  padding:30px 20px 60px;
+}
+
+.preview-title{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.preview-title small{
+  color:var(--gold);
+  font-size:8px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+}
+
+.preview-title h2{
+  font-family:Georgia,"Times New Roman",serif;
+  color:var(--ink);
+  font-size:30px;
+  font-weight:400;
+  margin:7px 0;
+}
+
+.preview-title p{
+  font-size:10px;
+  color:#746e67;
+  margin:0;
+}
+
+.empty{
+  width:8.5in;
+  margin:auto;
+  background:white;
+  padding:55px 20px;
+  text-align:center;
+  box-shadow:0 5px 20px rgba(0,0,0,.10);
+  color:#777068;
+}
+
+.empty strong{
+  display:block;
+  color:var(--ink);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:22px;
+  font-weight:400;
+  margin-bottom:7px;
+}
+
+/* =========================================================
+   LETTER SHEETS
+========================================================= */
+
+.sheet{
+  width:8.5in;
+  height:11in;
+  min-height:11in;
+  margin:0 auto 30px;
+  background:white;
+  position:relative;
+  box-shadow:0 7px 25px rgba(0,0,0,.15);
+  overflow:hidden;
+  page-break-after:always;
+}
+
+/* =========================================================
+   TABLE TENT CARDS
+   TWO PER LETTER SHEET
+========================================================= */
+
+.table-sheet{
+  padding:.42in .625in;
+  display:flex;
+  flex-direction:column;
+  gap:.32in;
+}
+
+.tent-wrap{
+  position:relative;
+  width:7.25in;
+  height:4.85in;
+  flex:0 0 4.85in;
+}
+
+.tent{
+  position:absolute;
+  inset:0;
+  border:1px solid #a8a199;
+  background:white;
+  overflow:hidden;
+}
+
+.tent-side{
+  position:absolute;
+  left:0;
+  width:100%;
+  height:50%;
+  overflow:hidden;
+}
+
+.tent-side.top{
+  top:0;
+  transform:rotate(180deg);
+}
+
+.tent-side.bottom{
+  bottom:0;
+}
+
+.foldline{
+  position:absolute;
+  left:0;
+  right:0;
+  top:50%;
+  border-top:1px dashed #8e8983;
+  z-index:30;
+}
+
+.foldtext{
+  position:absolute;
+  top:calc(50% - 7px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:31;
+  background:white;
+  color:#89837c;
+  font-size:6px;
+  letter-spacing:2px;
+  padding:2px 7px;
+  text-transform:uppercase;
+}
+
+/* CARD DESIGN */
+
+.table-design{
+  position:absolute;
+  inset:.07in;
+  background:
+    radial-gradient(circle at 82% 45%,rgba(189,141,60,.08),transparent 33%),
+    linear-gradient(
+      90deg,
+      var(--meal) 0%,
+      var(--meal) 27%,
+      var(--paper) 27%,
+      var(--paper) 100%
+    );
+  border:1px solid var(--meal);
+}
+
+.table-design:after{
+  content:"";
+  position:absolute;
+  inset:.055in;
+  border:1px solid rgba(189,141,60,.45);
+}
+
+.color-panel{
+  position:absolute;
+  top:0;
+  left:0;
+  bottom:0;
+  width:27%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+}
+
+.color-panel:after{
+  content:"";
+  position:absolute;
+  inset:.09in;
+  border:1px solid rgba(255,255,255,.42);
+}
+
+.symbol{
+  position:relative;
+  z-index:3;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:36px;
+}
+
+.table-content{
+  position:absolute;
+  left:27%;
+  right:0;
+  top:0;
+  bottom:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:.08in .25in;
+  z-index:5;
+}
+
+.courtyard{
+  color:var(--gold);
+  font-weight:bold;
+  letter-spacing:3.5px;
+  font-size:10px;
+}
+
+.marriott{
+  color:#252525;
+  font-size:4px;
+  font-weight:bold;
+  letter-spacing:1px;
+  margin-top:1px;
+}
+
+.lux-line{
+  width:1.15in;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin:6px 0 7px;
+}
+
+.lux-line:before,
+.lux-line:after{
+  content:"";
+  height:1px;
+  background:#c7a25d;
+  flex:1;
+}
+
+.lux-line span{
+  width:6px;
+  height:6px;
+  background:var(--gold);
+  transform:rotate(45deg);
+}
+
+.eyebrow{
+  font-size:5.5px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:#837b72;
+  margin-bottom:4px;
+}
+
+.meal-name{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:24px;
+  line-height:1;
+  color:var(--ink);
+}
+
+.description{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:6.5px;
+  font-style:italic;
+  color:#777069;
+  margin-top:5px;
+}
+
+.color-name{
+  color:var(--meal);
+  font-size:4.8px;
+  font-weight:bold;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+  margin-top:5px;
+}
+
+/* =========================================================
+   BUFFET CARDS
+========================================================= */
+
+.buffet-sheet{
+  padding:.63in .55in;
+}
+
+.buffet-grid{
+  display:grid;
+  grid-template-columns:3.5in 3.5in;
+  grid-auto-rows:2in;
+  column-gap:.4in;
+  row-gap:.32in;
+  justify-content:center;
+}
+
+.buffet-wrap{
+  position:relative;
+  width:3.5in;
+  height:2in;
+}
+
+.buffet-card{
+  position:absolute;
+  inset:0;
+  background:var(--paper);
+  border:1px solid var(--meal);
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:31% 69%;
+}
+
+.buffet-card:after{
+  content:"";
+  position:absolute;
+  inset:.055in;
+  border:1px solid rgba(189,141,60,.45);
+  pointer-events:none;
+}
+
+.buffet-color{
+  background:var(--meal);
+  color:white;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.buffet-color:after{
+  content:"";
+  position:absolute;
+  inset:.08in;
+  border:1px solid rgba(255,255,255,.42);
+}
+
+.buffet-symbol{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:29px;
+  position:relative;
+  z-index:2;
+}
+
+.buffet-info{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:.12in;
+  background:
+    radial-gradient(circle at 80% 30%,rgba(189,141,60,.07),transparent 35%),
+    var(--paper);
+}
+
+.buffet-brand{
+  color:var(--gold);
+  font-weight:bold;
+  font-size:7px;
+  letter-spacing:2px;
+}
+
+.buffet-marriott{
+  color:#222;
+  font-size:3px;
+  font-weight:bold;
+  letter-spacing:.8px;
+  margin:2px 0 7px;
+}
+
+.buffet-eyebrow{
+  color:#837b72;
+  font-size:5px;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-bottom:5px;
+}
+
+.buffet-name{
+  color:var(--ink);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:18px;
+  line-height:1;
+}
+
+.buffet-description{
+  color:#777069;
+  font-family:Georgia,"Times New Roman",serif;
+  font-style:italic;
+  font-size:6px;
+  margin-top:6px;
+}
+
+/* =========================================================
+   CUTTING MARKS
+========================================================= */
+
+.cut{
+  position:absolute;
+  background:#6e6e6e;
+  z-index:60;
+}
+
+.tlh{width:.15in;height:1px;left:-.17in;top:0}
+.tlv{width:1px;height:.15in;left:0;top:-.17in}
+
+.trh{width:.15in;height:1px;right:-.17in;top:0}
+.trv{width:1px;height:.15in;right:0;top:-.17in}
+
+.blh{width:.15in;height:1px;left:-.17in;bottom:0}
+.blv{width:1px;height:.15in;left:0;bottom:-.17in}
+
+.brh{width:.15in;height:1px;right:-.17in;bottom:0}
+.brv{width:1px;height:.15in;right:0;bottom:-.17in}
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@page{
+  size:Letter portrait;
+  margin:0;
+}
+
+@media print{
+
+  html,body{
+    width:8.5in !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:white !important;
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+  }
+
+  .controls,
+  .preview-title{
+    display:none !important;
+  }
+
+  .preview-area{
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  #preview{
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  .sheet{
+    width:8.5in !important;
+    height:11in !important;
+    min-height:11in !important;
+    margin:0 !important;
+    box-shadow:none !important;
+    page-break-after:always !important;
+    break-after:page !important;
+  }
+
+  .sheet:last-child{
+    page-break-after:auto !important;
+    break-after:auto !important;
+  }
+
+  .empty{
+    display:none !important;
+  }
+}
+
+@media(max-width:1100px){
+  .meal-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     CONTROL PANEL
+===================================================== -->
+
+<div class="controls">
+
+  <div class="topline">
+
+    <div>
+      <h1>Banquet Meal Card Studio</h1>
+      <div class="subtitle">
+        Create color-coded table meal tents and buffet dietary labels.
+      </div>
+    </div>
+
+    <div class="master">
+      COURTYARD • BANQUET COLLECTION
+    </div>
+
+  </div>
+
+  <div class="modebar">
+
+    <button
+      id="tableButton"
+      class="modebutton active"
+      onclick="changeMode('table')">
+      Table Meal Cards
+    </button>
+
+    <button
+      id="buffetButton"
+      class="modebutton"
+      onclick="changeMode('buffet')">
+      Buffet Station Cards
+    </button>
+
+  </div>
+
+  <div class="selector-heading">
+
+    <span>SELECT CARDS + QUANTITIES</span>
+
+    <div class="small-buttons">
+      <button onclick="selectEverything()">Select All</button>
+      <button onclick="clearEverything()">Clear All</button>
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       THESE ARE HARD-CODED.
+       THEY WILL ALWAYS SHOW.
+  ================================================== -->
+
+  <div class="meal-grid">
+
+    <!-- VEGETARIAN -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="vegetarian"
+          id="vegetarianCheck"
+          onchange="toggleQuantity('vegetarian')">
+
+        <span
+          class="swatch"
+          style="background:#7F9A78">
+        </span>
+
+        <span class="choice-name">
+          Vegetarian
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="vegetarianQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- VEGAN -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="vegan"
+          id="veganCheck"
+          onchange="toggleQuantity('vegan')">
+
+        <span
+          class="swatch"
+          style="background:#315B46">
+        </span>
+
+        <span class="choice-name">
+          Vegan
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="veganQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- PESCATARIAN -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="pescatarian"
+          id="pescatarianCheck"
+          onchange="toggleQuantity('pescatarian')">
+
+        <span
+          class="swatch"
+          style="background:#557D96">
+        </span>
+
+        <span class="choice-name">
+          Pescatarian
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="pescatarianQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- GLUTEN FREE -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="glutenfree"
+          id="glutenfreeCheck"
+          onchange="toggleQuantity('glutenfree')">
+
+        <span
+          class="swatch"
+          style="background:#C19A52">
+        </span>
+
+        <span class="choice-name">
+          Gluten-Free
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="glutenfreeQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- DAIRY FREE -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="dairyfree"
+          id="dairyfreeCheck"
+          onchange="toggleQuantity('dairyfree')">
+
+        <span
+          class="swatch"
+          style="background:#8D7FA3">
+        </span>
+
+        <span class="choice-name">
+          Dairy-Free
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="dairyfreeQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- NUT FREE -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="nutfree"
+          id="nutfreeCheck"
+          onchange="toggleQuantity('nutfree')">
+
+        <span
+          class="swatch"
+          style="background:#C87862">
+        </span>
+
+        <span class="choice-name">
+          Nut-Free
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="nutfreeQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- CONTAINS NUTS -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="containsnuts"
+          id="containsnutsCheck"
+          onchange="toggleQuantity('containsnuts')">
+
+        <span
+          class="swatch"
+          style="background:#A95F32">
+        </span>
+
+        <span class="choice-name">
+          Contains Nuts
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="containsnutsQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- SPICY -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="spicy"
+          id="spicyCheck"
+          onchange="toggleQuantity('spicy')">
+
+        <span
+          class="swatch"
+          style="background:#873E49">
+        </span>
+
+        <span class="choice-name">
+          Spicy
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="spicyQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- NO PORK -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="nopork"
+          id="noporkCheck"
+          onchange="toggleQuantity('nopork')">
+
+        <span
+          class="swatch"
+          style="background:#76536F">
+        </span>
+
+        <span class="choice-name">
+          No Pork
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="noporkQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+
+    <!-- CHEF -->
+
+    <div class="meal-choice">
+      <div class="choice-title">
+
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-meal="chef"
+          id="chefCheck"
+          onchange="toggleQuantity('chef')">
+
+        <span
+          class="swatch"
+          style="background:#494643">
+        </span>
+
+        <span class="choice-name">
+          Chef's Selection
+        </span>
+
+      </div>
+
+      <div class="quantity">
+        <label>Quantity</label>
+
+        <input
+          id="chefQty"
+          type="number"
+          value="1"
+          min="1"
+          max="99"
+          disabled
+          onchange="makeCards()">
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="actions">
+
+    <button
+      class="gold-button"
+      onclick="makeCards()">
+      Update Cards
+    </button>
+
+    <button
+      class="white-button"
+      onclick="window.print()">
+      Print / Save PDF
+    </button>
+
+    <div
+      id="summary"
+      class="summary">
+      No cards selected
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     PREVIEW
+===================================================== -->
+
+<div class="preview-area">
+
+  <div class="preview-title">
+
+    <small>LIVE PREVIEW</small>
+
+    <h2 id="previewHeading">
+      Table Meal Cards
+    </h2>
+
+    <p id="instructions">
+      Foldable table tents • Cut on outer guides • Fold on center line.
+    </p>
+
+  </div>
+
+  <div id="preview">
+
+    <div class="empty">
+      <strong>Select the cards you need</strong>
+      Choose one or several meal types above and enter the quantity of each.
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DATA
+========================================================= */
+
+var mealData = {
+
+  vegetarian:{
+    name:"Vegetarian",
+    color:"#7F9A78",
+    symbol:"❧",
+    eyebrow:"Special Meal",
+    description:"Prepared especially for you"
+  },
+
+  vegan:{
+    name:"Vegan",
+    color:"#315B46",
+    symbol:"❧",
+    eyebrow:"Special Meal",
+    description:"Plant-based selection"
+  },
+
+  pescatarian:{
+    name:"Pescatarian",
+    color:"#557D96",
+    symbol:"◖",
+    eyebrow:"Special Meal",
+    description:"Seafood selection"
+  },
+
+  glutenfree:{
+    name:"Gluten-Free",
+    color:"#C19A52",
+    symbol:"◇",
+    eyebrow:"Special Meal",
+    description:"Special dietary selection"
+  },
+
+  dairyfree:{
+    name:"Dairy-Free",
+    color:"#8D7FA3",
+    symbol:"○",
+    eyebrow:"Special Meal",
+    description:"Prepared without dairy ingredients"
+  },
+
+  nutfree:{
+    name:"Nut-Free",
+    color:"#C87862",
+    symbol:"◇",
+    eyebrow:"Special Meal",
+    description:"Special dietary selection"
+  },
+
+  containsnuts:{
+    name:"Contains Nuts",
+    color:"#A95F32",
+    symbol:"◆",
+    eyebrow:"Dietary Notice",
+    description:"Please enjoy with care"
+  },
+
+  spicy:{
+    name:"Spicy",
+    color:"#873E49",
+    symbol:"✦",
+    eyebrow:"Flavor Note",
+    description:"Prepared with a little heat"
+  },
+
+  nopork:{
+    name:"No Pork",
+    color:"#76536F",
+    symbol:"◇",
+    eyebrow:"Special Meal",
+    description:"Prepared without pork"
+  },
+
+  chef:{
+    name:"Chef's Selection",
+    color:"#494643",
+    symbol:"✧",
+    eyebrow:"Dinner Selection",
+    description:"Our featured entrée"
+  }
+
+};
+
+var currentMode = "table";
+
+
+/* =========================================================
+   BASIC CONTROLS
+========================================================= */
+
+function toggleQuantity(id){
+
+  var check =
+    document.getElementById(id + "Check");
+
+  var qty =
+    document.getElementById(id + "Qty");
+
+  qty.disabled = !check.checked;
+
+  makeCards();
+}
+
+
+function selectEverything(){
+
+  var checks =
+    document.querySelectorAll(".meal-check");
+
+  for(var i=0;i<checks.length;i++){
+
+    checks[i].checked = true;
+
+    var id =
+      checks[i].getAttribute("data-meal");
+
+    document.getElementById(
+      id + "Qty"
+    ).disabled = false;
+  }
+
+  makeCards();
+}
+
+
+function clearEverything(){
+
+  var checks =
+    document.querySelectorAll(".meal-check");
+
+  for(var i=0;i<checks.length;i++){
+
+    checks[i].checked = false;
+
+    var id =
+      checks[i].getAttribute("data-meal");
+
+    document.getElementById(
+      id + "Qty"
+    ).disabled = true;
+  }
+
+  makeCards();
+}
+
+
+/* =========================================================
+   MODE SWITCH
+========================================================= */
+
+function changeMode(mode){
+
+  currentMode = mode;
+
+  var table =
+    document.getElementById("tableButton");
+
+  var buffet =
+    document.getElementById("buffetButton");
+
+  if(mode === "table"){
+
+    table.classList.add("active");
+    buffet.classList.remove("active");
+
+    document.getElementById(
+      "previewHeading"
+    ).innerHTML =
+      "Table Meal Cards";
+
+    document.getElementById(
+      "instructions"
+    ).innerHTML =
+      "Foldable table tents • Cut on outer guides • Fold on center line • Letter cardstock • 100% / Actual Size.";
+
+  }else{
+
+    buffet.classList.add("active");
+    table.classList.remove("active");
+
+    document.getElementById(
+      "previewHeading"
+    ).innerHTML =
+      "Buffet Station Cards";
+
+    document.getElementById(
+      "instructions"
+    ).innerHTML =
+      '3.5" × 2" buffet labels • Up to 8 per Letter sheet • Cut on guides • 100% / Actual Size.';
+  }
+
+  makeCards();
+}
+
+
+/* =========================================================
+   BUILD CARD LIST
+========================================================= */
+
+function getCards(){
+
+  var cards = [];
+
+  var checks =
+    document.querySelectorAll(".meal-check");
+
+  for(var i=0;i<checks.length;i++){
+
+    if(checks[i].checked){
+
+      var id =
+        checks[i].getAttribute(
+          "data-meal"
+        );
+
+      var quantity =
+        parseInt(
+          document.getElementById(
+            id + "Qty"
+          ).value,
+          10
+        );
+
+      if(
+        isNaN(quantity) ||
+        quantity < 1
+      ){
+        quantity = 1;
+      }
+
+      for(var q=0;q<quantity;q++){
+        cards.push(
+          mealData[id]
+        );
+      }
+    }
+  }
+
+  return cards;
+}
+
+
+/* =========================================================
+   CUT MARKS
+========================================================= */
+
+function cuts(){
+
+  return '' +
+  '<span class="cut tlh"></span>' +
+  '<span class="cut tlv"></span>' +
+  '<span class="cut trh"></span>' +
+  '<span class="cut trv"></span>' +
+  '<span class="cut blh"></span>' +
+  '<span class="cut blv"></span>' +
+  '<span class="cut brh"></span>' +
+  '<span class="cut brv"></span>';
+}
+
+
+/* =========================================================
+   TABLE DESIGN
+========================================================= */
+
+function tableSide(meal,position){
+
+  return '' +
+
+  '<div class="tent-side ' +
+  position +
+  '">' +
+
+    '<div class="table-design" ' +
+    'style="--meal:' +
+    meal.color +
+    ';">' +
+
+      '<div class="color-panel">' +
+
+        '<div class="symbol">' +
+        meal.symbol +
+        '</div>' +
+
+      '</div>' +
+
+      '<div class="table-content">' +
+
+        '<div class="courtyard">' +
+        'COURTYARD' +
+        '</div>' +
+
+        '<div class="marriott">' +
+        'BY MARRIOTT' +
+        '</div>' +
+
+        '<div class="lux-line">' +
+        '<span></span>' +
+        '</div>' +
+
+        '<div class="eyebrow">' +
+        meal.eyebrow +
+        '</div>' +
+
+        '<div class="meal-name">' +
+        meal.name +
+        '</div>' +
+
+        '<div class="description">' +
+        meal.description +
+        '</div>' +
+
+        '<div class="color-name">' +
+        meal.name +
+        '</div>' +
+
+      '</div>' +
+
+    '</div>' +
+
+  '</div>';
+}
+
+
+function tableCard(meal){
+
+  return '' +
+
+  '<div class="tent-wrap">' +
+
+    cuts() +
+
+    '<div class="tent">' +
+
+      tableSide(meal,"top") +
+
+      '<div class="foldline"></div>' +
+
+      '<div class="foldtext">' +
+      'FOLD' +
+      '</div>' +
+
+      tableSide(meal,"bottom") +
+
+    '</div>' +
+
+  '</div>';
+}
+
+
+/* =========================================================
+   BUFFET DESIGN
+========================================================= */
+
+function buffetCard(meal){
+
+  return '' +
+
+  '<div class="buffet-wrap">' +
+
+    cuts() +
+
+    '<div class="buffet-card" ' +
+    'style="--meal:' +
+    meal.color +
+    ';">' +
+
+      '<div class="buffet-color">' +
+
+        '<div class="buffet-symbol">' +
+        meal.symbol +
+        '</div>' +
+
+      '</div>' +
+
+      '<div class="buffet-info">' +
+
+        '<div class="buffet-brand">' +
+        'COURTYARD' +
+        '</div>' +
+
+        '<div class="buffet-marriott">' +
+        'BY MARRIOTT' +
+        '</div>' +
+
+        '<div class="buffet-eyebrow">' +
+        meal.eyebrow +
+        '</div>' +
+
+        '<div class="buffet-name">' +
+        meal.name +
+        '</div>' +
+
+        '<div class="buffet-description">' +
+        meal.description +
+        '</div>' +
+
+      '</div>' +
+
+    '</div>' +
+
+  '</div>';
+}
+
+
+/* =========================================================
+   TABLE PAGES
+========================================================= */
+
+function buildTablePages(cards){
+
+  var preview =
+    document.getElementById(
+      "preview"
+    );
+
+  preview.innerHTML = "";
+
+  for(
+    var i=0;
+    i<cards.length;
+    i+=2
+  ){
+
+    var sheet =
+      document.createElement(
+        "div"
+      );
+
+    sheet.className =
+      "sheet table-sheet";
+
+    sheet.innerHTML +=
+      tableCard(cards[i]);
+
+    if(cards[i+1]){
+      sheet.innerHTML +=
+        tableCard(cards[i+1]);
+    }
+
+    preview.appendChild(sheet);
+  }
+}
+
+
+/* =========================================================
+   BUFFET PAGES
+========================================================= */
+
+function buildBuffetPages(cards){
+
+  var preview =
+    document.getElementById(
+      "preview"
+    );
+
+  preview.innerHTML = "";
+
+  for(
+    var i=0;
+    i<cards.length;
+    i+=8
+  ){
+
+    var sheet =
+      document.createElement(
+        "div"
+      );
+
+    sheet.className =
+      "sheet buffet-sheet";
+
+    var grid =
+      document.createElement(
+        "div"
+      );
+
+    grid.className =
+      "buffet-grid";
+
+    for(
+      var x=i;
+      x<i+8 &&
+      x<cards.length;
+      x++
+    ){
+
+      grid.innerHTML +=
+        buffetCard(cards[x]);
+    }
+
+    sheet.appendChild(grid);
+
+    preview.appendChild(sheet);
+  }
+}
+
+
+/* =========================================================
+   MAIN UPDATE
+========================================================= */
+
+function makeCards(){
+
+  var cards =
+    getCards();
+
+  var preview =
+    document.getElementById(
+      "preview"
+    );
+
+  if(cards.length === 0){
+
+    preview.innerHTML =
+      '<div class="empty">' +
+      '<strong>Select the cards you need</strong>' +
+      'Choose one or several meal types above and enter the quantity of each.' +
+      '</div>';
+
+    document.getElementById(
+      "summary"
+    ).innerHTML =
+      "No cards selected";
+
+    return;
+  }
+
+  var perPage =
+    currentMode === "table"
+      ? 2
+      : 8;
+
+  var pages =
+    Math.ceil(
+      cards.length / perPage
+    );
+
+  document.getElementById(
+    "summary"
+  ).innerHTML =
+    '<strong>' +
+    cards.length +
+    '</strong> cards &nbsp; • &nbsp; ' +
+    '<strong>' +
+    pages +
+    '</strong> print page' +
+    (pages === 1 ? "" : "s");
+
+  if(currentMode === "table"){
+    buildTablePages(cards);
+  }else{
+    buildBuffetPages(cards);
+  }
+}
+
+</script>
+
+</body>
+</html>

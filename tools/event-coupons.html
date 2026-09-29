@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Courtyard Event Coupon Tool</title>
+
+<style>
+
+:root{
+    --gold:#B88A3B;
+    --gold-light:#DCC28A;
+    --ivory:#FCF8EF;
+    --cream:#F5EBDD;
+    --ink:#152D3B;
+    --teal:#153F3A;
+    --navy:#213E4F;
+}
+
+*{box-sizing:border-box;}
+
+html,body{
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:#EAE7E0;
+    color:var(--ink);
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+/* =========================================================
+   EDITOR
+========================================================= */
+
+.editor{
+    background:#213E4F;
+    color:white;
+    padding:15px 4%;
+    box-shadow:0 5px 18px rgba(0,0,0,.16);
+}
+
+.editor-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:13px;
+}
+
+.editor h1{
+    margin:0;
+    font-family:Georgia,"Times New Roman",serif;
+    font-weight:400;
+    font-size:24px;
+}
+
+.master-label{
+    color:#E9CA86;
+    font-size:9px;
+    letter-spacing:3px;
+}
+
+.fields{
+    display:grid;
+    grid-template-columns:1.4fr .85fr .85fr 1fr 1fr;
+    gap:9px;
+}
+
+.field label{
+    display:block;
+    margin-bottom:4px;
+    color:#F2E8D5;
+    font-size:8px;
+    font-weight:bold;
+    letter-spacing:1.2px;
+}
+
+.field input,
+.field select{
+    width:100%;
+    height:35px;
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:4px;
+    padding:7px 9px;
+    background:#fff;
+    color:#152D3B;
+    font-size:12px;
+}
+
+.section-title{
+    margin:14px 0 7px;
+    color:#E9CA86;
+    font-size:9px;
+    letter-spacing:2px;
+}
+
+.dynamic-fields{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:9px;
+}
+
+.detail-box{
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:5px;
+    padding:9px;
+}
+
+.detail-box label{
+    display:block;
+    margin-bottom:4px;
+    font-size:8px;
+    font-weight:bold;
+    letter-spacing:1px;
+    color:#F2E8D5;
+}
+
+.detail-box input,
+.detail-box select{
+    width:100%;
+    height:34px;
+    padding:7px;
+    border:0;
+    border-radius:3px;
+}
+
+.full-row{
+    grid-column:span 2;
+}
+
+.actions{
+    display:flex;
+    gap:9px;
+    margin-top:13px;
+}
+
+button{
+    border:0;
+    border-radius:4px;
+    padding:11px 19px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.update-btn{
+    background:#C49747;
+    color:white;
+}
+
+.print-btn{
+    background:white;
+    color:#18303E;
+}
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+.preview-title{
+    text-align:center;
+    padding:26px 10px 14px;
+}
+
+.preview-title small{
+    color:var(--gold);
+    letter-spacing:4px;
+    font-size:8px;
+}
+
+.preview-title h2{
+    margin:7px 0 0;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:30px;
+    font-weight:400;
+}
+
+.preview-grid{
+    width:min(1280px,95%);
+    margin:0 auto 50px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:27px;
+}
+
+.preview-label{
+    text-align:center;
+    color:#756A5C;
+    font-size:8px;
+    letter-spacing:3px;
+    margin-bottom:8px;
+}
+
+/* =========================================================
+   COUPON MASTER
+========================================================= */
+
+.coupon{
+    position:relative;
+    width:100%;
+    aspect-ratio:1.53846 / 1;
+    overflow:hidden;
+    background:var(--ivory);
+    border:2px solid var(--gold);
+    box-shadow:0 15px 35px rgba(36,28,17,.14);
+
+    --photo:url("../assets/events/corporate.jpg");
+    --accent:#153F3A;
+}
+
+.coupon::after{
+    content:"";
+    position:absolute;
+    inset:9px;
+    border:1px solid rgba(184,138,59,.72);
+    z-index:80;
+    pointer-events:none;
+}
+
+/* CORNERS */
+
+.corner{
+    position:absolute;
+    width:17px;
+    height:17px;
+    z-index:90;
+}
+
+.corner.tl{
+    left:10px;top:10px;
+    border-left:2px solid var(--gold);
+    border-top:2px solid var(--gold);
+}
+
+.corner.tr{
+    right:10px;top:10px;
+    border-right:2px solid var(--gold);
+    border-top:2px solid var(--gold);
+}
+
+.corner.bl{
+    left:10px;bottom:10px;
+    border-left:2px solid var(--gold);
+    border-bottom:2px solid var(--gold);
+}
+
+.corner.br{
+    right:10px;bottom:10px;
+    border-right:2px solid var(--gold);
+    border-bottom:2px solid var(--gold);
+}
+
+/* =========================================================
+   FRONT PHOTO
+========================================================= */
+
+.front-photo{
+    position:absolute;
+    inset:0 auto 0 0;
+    width:39%;
+    background-image:
+        linear-gradient(
+            180deg,
+            rgba(4,24,24,.08),
+            rgba(3,25,22,.40)
+        ),
+        var(--photo);
+    background-size:cover;
+    background-position:center;
+    z-index:1;
+}
+
+.front-photo::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(1,18,16,.28),
+            transparent 65%
+        ),
+        linear-gradient(
+            0deg,
+            rgba(1,18,16,.34),
+            transparent 60%
+        );
+}
+
+/* CURVE */
+
+.front-curve{
+    position:absolute;
+    z-index:5;
+    left:31%;
+    top:-13%;
+    width:18%;
+    height:126%;
+    border-left:3px solid var(--gold);
+    border-right:1px solid var(--gold-light);
+    border-radius:50% 0 0 50%;
+    background:var(--ivory);
+    transform:rotate(1.5deg);
+    box-shadow:-4px 0 0 rgba(220,196,142,.3);
+}
+
+/* LEFT EVENT AREA */
+
+.event-badge{
+    position:absolute;
+    z-index:20;
+    left:18%;
+    top:11%;
+    transform:translateX(-50%);
+    width:92px;
+    height:92px;
+    border:2px solid #E5D0A0;
+    background:rgba(4,34,31,.72);
+    transform-origin:center;
+    rotate:45deg;
+    box-shadow:0 4px 15px rgba(0,0,0,.22);
+}
+
+.event-badge-inner{
+    position:absolute;
+    inset:6px;
+    border:1px solid rgba(255,255,255,.72);
+}
+
+.event-badge-text{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:1px;
+    text-align:center;
+    rotate:-45deg;
+    padding:12px;
+}
+
+.left-details{
+    position:absolute;
+    z-index:20;
+    left:4%;
+    top:50%;
+    width:27%;
+    color:white;
+    text-align:center;
+    text-transform:uppercase;
+    text-shadow:0 2px 6px rgba(0,0,0,.7);
+}
+
+.left-group{
+    font-size:9px;
+    line-height:1.45;
+    font-weight:bold;
+    letter-spacing:2px;
+}
+
+.left-line{
+    width:48px;
+    height:1px;
+    margin:9px auto;
+    background:var(--gold-light);
+}
+
+.left-meta{
+    font-size:6.5px;
+    line-height:1.7;
+    letter-spacing:2px;
+}
+
+/* =========================================================
+   MAIN FRONT
+========================================================= */
+
+.front-main{
+    position:absolute;
+    z-index:10;
+    left:39%;
+    right:0;
+    top:0;
+    bottom:0;
+    padding:6.5% 5% 3% 3%;
+    text-align:center;
+}
+
+.front-watermark{
+    position:absolute;
+    z-index:-1;
+    right:-6%;
+    top:5%;
+    width:46%;
+    height:60%;
+    opacity:.045;
+    filter:grayscale(100%);
+    background-image:var(--photo);
+    background-size:cover;
+    background-position:center;
+    border-radius:50%;
+}
+
+/* BRAND */
+
+.brand{
+    color:var(--gold);
+    font-size:20px;
+    font-weight:bold;
+    letter-spacing:6px;
+    line-height:1;
+}
+
+.brand-sub{
+    margin-top:4px;
+    color:#111;
+    font-size:5.5px;
+    font-weight:bold;
+    letter-spacing:1.1px;
+}
+
+.gold-divider{
+    position:relative;
+    width:180px;
+    height:1px;
+    margin:16px auto 13px;
+    background:var(--gold-light);
+}
+
+.gold-divider::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:-4px;
+    width:8px;
+    height:8px;
+    background:var(--gold);
+    transform:translateX(-50%) rotate(45deg);
+}
+
+/* EVENT EYEBROW */
+
+.eyebrow{
+    margin-bottom:7px;
+    color:#7B6750;
+    font-size:7px;
+    font-weight:bold;
+    letter-spacing:2.3px;
+    text-transform:uppercase;
+}
+
+/* TITLE */
+
+.main-title{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:34px;
+    line-height:.95;
+}
+
+.main-title-gold{
+    margin-top:4px;
+    color:var(--gold);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:39px;
+    line-height:.95;
+    letter-spacing:5px;
+}
+
+/* ENTITLEMENT BOX */
+
+.entitlement-frame{
+    position:relative;
+    width:91%;
+    margin:19px auto 0;
+    padding:5px;
+    border:2px solid var(--gold);
+}
+
+.entitlement-frame::after{
+    content:"";
+    position:absolute;
+    inset:4px;
+    border:1px solid var(--gold-light);
+    pointer-events:none;
+}
+
+.entitlement{
+    min-height:65px;
+    display:grid;
+    grid-template-columns:43% 57%;
+    align-items:center;
+    background:
+        linear-gradient(
+            90deg,
+            var(--accent) 0%,
+            var(--accent) 45%,
+            rgba(249,244,233,.98) 73%
+        );
+}
+
+.entitlement-left{
+    color:white;
+    border-right:1px solid var(--gold);
+    padding:5px 8px;
+    font-size:7px;
+    line-height:1.45;
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+}
+
+.entitlement-left strong{
+    display:block;
+    margin-top:3px;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:11px;
+    letter-spacing:.8px;
+}
+
+.entitlement-right{
+    padding:4px 9px;
+    color:var(--ink);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:15px;
+    line-height:1.15;
+}
+
+/* FOOTER */
+
+.hospitality-line{
+    margin-top:11px;
+    color:#69594A;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:8px;
+    font-style:italic;
+}
+
+.small-divider{
+    position:relative;
+    width:175px;
+    height:1px;
+    margin:10px auto 7px;
+    background:var(--gold-light);
+}
+
+.small-divider::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:-3px;
+    width:7px;
+    height:7px;
+    background:var(--gold);
+    transform:translateX(-50%) rotate(45deg);
+}
+
+.restrictions{
+    font-size:5.2px;
+    line-height:1.5;
+    letter-spacing:.4px;
+    color:#625C54;
+}
+
+/* =========================================================
+   BACK
+========================================================= */
+
+.coupon-back{
+    background:
+        radial-gradient(
+            circle at 50% 42%,
+            #FFFDF8 0%,
+            var(--ivory) 58%,
+            #F4E8D4 100%
+        );
+}
+
+.back-watermark{
+    position:absolute;
+    right:-5%;
+    bottom:-16%;
+    width:62%;
+    height:95%;
+    z-index:1;
+    background-image:var(--photo);
+    background-size:cover;
+    background-position:center;
+    opacity:.075;
+    filter:grayscale(100%) sepia(15%);
+    -webkit-mask-image:
+        radial-gradient(
+            ellipse at center,
+            #000 0%,
+            rgba(0,0,0,.8) 30%,
+            transparent 72%
+        );
+    mask-image:
+        radial-gradient(
+            ellipse at center,
+            #000 0%,
+            rgba(0,0,0,.8) 30%,
+            transparent 72%
+        );
+}
+
+.back-content{
+    position:absolute;
+    z-index:10;
+    inset:0;
+    padding:7% 11% 5%;
+    text-align:center;
+}
+
+.back-brand{
+    color:var(--gold);
+    font-size:19px;
+    font-weight:bold;
+    letter-spacing:6px;
+}
+
+.back-brand-sub{
+    margin-top:4px;
+    color:#111;
+    font-size:5.5px;
+    font-weight:bold;
+    letter-spacing:1.1px;
+}
+
+.back-eyebrow{
+    margin-top:21px;
+    color:#746653;
+    font-size:7px;
+    font-weight:bold;
+    letter-spacing:3px;
+    text-transform:uppercase;
+}
+
+.back-title{
+    margin-top:10px;
+    color:var(--gold);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:37px;
+    line-height:1.1;
+    font-style:italic;
+}
+
+.back-message{
+    margin-top:14px;
+    color:var(--ink);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:18px;
+    line-height:1.3;
+}
+
+.back-message strong{
+    font-size:20px;
+}
+
+.back-group{
+    margin-top:19px;
+    color:#655D52;
+    font-size:7px;
+    line-height:1.7;
+    letter-spacing:2.8px;
+    text-transform:uppercase;
+}
+
+.back-custom{
+    margin-top:15px;
+    color:#514B43;
+    font-size:7px;
+    line-height:1.65;
+    letter-spacing:2.3px;
+    text-transform:uppercase;
+}
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+#printArea{
+    display:none;
+}
+
+/*
+LETTER 8.5 x 11
+8 COUPONS
+2 x 4
+*/
+
+.print-page{
+    width:8.5in;
+    height:11in;
+    position:relative;
+    background:#fff;
+
+    display:grid;
+    grid-template-columns:3.60in 3.60in;
+    grid-template-rows:repeat(4,2.34in);
+
+    column-gap:.28in;
+    row-gap:.18in;
+
+    justify-content:center;
+    align-content:start;
+
+    padding-top:.40in;
+    padding-bottom:.40in;
+
+    page-break-after:always;
+    break-after:page;
+
+    overflow:hidden;
+}
+
+.print-slot{
+    position:relative;
+    width:3.60in;
+    height:2.34in;
+    overflow:visible;
+}
+
+.print-coupon-shell{
+    position:absolute;
+    inset:0;
+    width:3.60in;
+    height:2.34in;
+    overflow:hidden;
+}
+
+.print-coupon-shell .coupon{
+    position:absolute;
+    left:0;
+    top:0;
+    width:600px;
+    height:390px;
+    transform:scale(.576);
+    transform-origin:top left;
+    box-shadow:none;
+}
+
+/* CUT MARKS */
+
+.crop{
+    position:absolute;
+    z-index:1000;
+    background:#777;
+    pointer-events:none;
+}
+
+.crop.tl-h,.crop.bl-h{
+    width:.12in;
+    height:.5px;
+    left:-.14in;
+}
+
+.crop.tr-h,.crop.br-h{
+    width:.12in;
+    height:.5px;
+    right:-.14in;
+}
+
+.crop.tl-h,.crop.tr-h{top:0;}
+.crop.bl-h,.crop.br-h{bottom:0;}
+
+.crop.tl-v,.crop.tr-v{
+    width:.5px;
+    height:.12in;
+    top:-.14in;
+}
+
+.crop.bl-v,.crop.br-v{
+    width:.5px;
+    height:.12in;
+    bottom:-.14in;
+}
+
+.crop.tl-v,.crop.bl-v{left:0;}
+.crop.tr-v,.crop.br-v{right:0;}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1100px){
+
+    .fields{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .dynamic-fields{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .preview-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+/* =========================================================
+   PRINT SETTINGS
+========================================================= */
+
+@media print{
+
+    @page{
+        size:Letter portrait;
+        margin:0;
+    }
+
+    html,body{
+        width:8.5in!important;
+        margin:0!important;
+        padding:0!important;
+        background:#fff!important;
+    }
+
+    .editor,
+    .preview-title,
+    .preview-grid{
+        display:none!important;
+    }
+
+    #printArea{
+        display:block!important;
+        margin:0!important;
+        padding:0!important;
+    }
+
+    .print-page{
+        margin:0!important;
+    }
+
+    .coupon{
+        -webkit-print-color-adjust:exact!important;
+        print-color-adjust:exact!important;
+    }
+}
+
+</style>
+<link rel="stylesheet" href="../assets/coupon-print.css?v=2">
+<link rel="stylesheet" href="../assets/refinements.css?v=4">
+</head>
+
+<body>
+<nav class="studio-nav"><a href="../index.html">← Banquet Print Studio</a></nav>
+
+<!-- ======================================================
+     EDITOR
+====================================================== -->
+
+<section class="editor">
+
+<div class="editor-top">
+
+<h1>Event Coupon Creator</h1>
+
+<div class="master-label">
+COURTYARD • PREMIUM EVENT MASTER
+</div>
+
+</div>
+
+<div class="fields">
+
+<div class="field">
+<label>GROUP / EVENT NAME</label>
+<input id="groupName" value="Texas Remainder Expo">
+</div>
+
+<div class="field">
+<label>EVENT TYPE</label>
+<select id="eventType">
+<option>Corporate</option>
+<option>Social Event</option>
+<option>Wedding</option>
+</select>
+</div>
+
+<div class="field">
+<label>COUPON TYPE</label>
+<select id="couponType">
+<option>Drink</option>
+<option>Breakfast</option>
+</select>
+</div>
+
+<div class="field">
+<label>EVENT / STAY DATES</label>
+<input id="eventDates" value="September 2026">
+</div>
+
+<div class="field">
+<label>LOCATION</label>
+<input id="location" value="Carrollton, TX">
+</div>
+
+</div>
+
+<div class="section-title">
+COUPON DETAILS
+</div>
+
+<div class="dynamic-fields">
+
+<div class="detail-box" id="dateBox">
+<label>REDEMPTION DATE</label>
+<input id="redeemDate" value="September 26">
+</div>
+
+<div class="detail-box" id="timeBox">
+<label>TIME / SERVICE HOURS</label>
+<input id="serviceTime" value="7:00 AM - 9:00 AM">
+</div>
+
+<div class="detail-box" id="drinkBox">
+<label>DRINK ENTITLEMENT</label>
+
+<select id="drinkChoice">
+<option>Beer & Wine Only</option>
+<option>One Beer or House Wine</option>
+<option>Selected Bar Drinks</option>
+<option>One Complimentary Drink</option>
+<option>Drink Ticket</option>
+<option>Custom</option>
+</select>
+</div>
+
+<div class="detail-box" id="customDrinkBox" style="display:none;">
+<label>CUSTOM DRINK DESCRIPTION</label>
+<input id="customDrink" value="Beer & Wine Only">
+</div>
+
+<div class="detail-box">
+<label>QUANTITY TO PRINT</label>
+<input id="quantity" type="number" min="1" value="8">
+</div>
+
+<div class="detail-box">
+<label>ROOM NUMBER</label>
+<input id="roomNumber" placeholder="Optional">
+</div>
+
+<div class="detail-box full-row">
+<label>CUSTOM HOSPITALITY MESSAGE</label>
+<input
+id="customMessage"
+value="We hope you enjoy your time with us.">
+</div>
+
+</div>
+
+<div class="duplex-help"><label for="imageMode">IMAGE MODE</label><select id="imageMode"><option value="premium">Premium Image</option><option value="ink">Ink Saver / No Image</option></select><p>6 coupons per US Letter sheet · 2 columns × 3 rows.<br>Print double-sided, <strong>flip on long edge</strong>, at <strong>100% / Actual size</strong>. Turn off headers/footers and enable background graphics. Each front page is followed by its matching back page. Empty positions move to the opposite column on the back so partial sheets cut correctly.</p></div><div class="actions">
+
+<button class="update-btn" onclick="updateTool()">
+Update Coupon
+</button>
+
+<button class="print-btn" onclick="printCoupons()">
+Print / Save PDF
+</button>
+
+</div>
+
+</section>
+
+<!-- ======================================================
+     PREVIEW
+====================================================== -->
+
+<div class="preview-title">
+
+<small>LIVE PREVIEW</small>
+
+<h2 id="previewTitle">
+Texas Remainder Expo
+</h2>
+
+</div>
+
+<div class="preview-grid">
+
+<div>
+
+<div class="preview-label">
+FRONT
+</div>
+
+<div id="frontPreview"></div>
+
+</div>
+
+<div>
+
+<div class="preview-label">
+BACK
+</div>
+
+<div id="backPreview"></div>
+
+</div>
+
+</div>
+
+<div id="printArea"></div>
+
+<script>
+
+/* =========================================================
+   VISUAL LIBRARY
+========================================================= */
+
+const visuals={
+
+    Corporate:{
+        image:"../assets/events/corporate.jpg",
+        accent:"#183E3A",
+        label:"CORPORATE EVENT"
+    },
+
+    "Social Event":{
+        image:"../assets/events/social.jpg",
+        accent:"#493127",
+        label:"SOCIAL EVENT"
+    },
+
+    Wedding:{
+        image:"../assets/events/wedding.jpg",
+        accent:"#765A4D",
+        label:"CELEBRATION"
+    },
+
+    Breakfast:{
+        image:"../assets/events/breakfast.jpg",
+        accent:"#66533A",
+        label:"BREAKFAST"
+    }
+
+};
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function val(id){
+    return document.getElementById(id).value.trim();
+}
+
+function esc(text){
+
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+}
+
+function corners(){
+
+return `
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+`;
+
+}
+
+/* =========================================================
+   CURRENT VISUAL
+========================================================= */
+
+function currentVisual(){
+
+    if(val("couponType")==="Breakfast"){
+        return visuals.Breakfast;
+    }
+
+    return visuals[val("eventType")];
+}
+
+/* =========================================================
+   DRINK ENTITLEMENT
+========================================================= */
+
+function drinkEntitlement(){
+
+    if(val("drinkChoice")==="Custom"){
+        return val("customDrink") || "Complimentary Drink";
+    }
+
+    return val("drinkChoice");
+}
+
+/* =========================================================
+   FRONT TITLE
+========================================================= */
+
+function titleInfo(){
+
+    if(val("couponType")==="Breakfast"){
+
+        return{
+            top:"Complimentary",
+            bottom:"BREAKFAST"
+        };
+
+    }
+
+    return{
+        top:"Complimentary",
+        bottom:"DRINK"
+    };
+}
+
+/* =========================================================
+   EVENT BADGE
+========================================================= */
+
+function badgeText(){
+
+    if(val("eventType")==="Wedding"){
+        return "CELEBRATE";
+    }
+
+    if(val("eventType")==="Social Event"){
+        return "WELCOME";
+    }
+
+    return "GUEST";
+}
+
+/* =========================================================
+   FRONT COUPON
+========================================================= */
+
+function makeFront(){
+
+    const visual=currentVisual();
+    const title=titleInfo();
+    const type=val("couponType");
+
+    let detailRight="";
+    let restrictions="";
+
+    if(type==="Breakfast"){
+
+        detailRight=
+            esc(val("serviceTime") || "Breakfast Service");
+
+        restrictions=
+            "Valid only for the named group and date. One-time use. Please surrender voucher upon redemption.";
+
+    }else{
+
+        detailRight=
+            esc(drinkEntitlement());
+
+        restrictions=
+            "One-time use. Please surrender voucher upon redemption. No cash value. Alcohol service requires valid ID and guest must be 21+.";
+
+    }
+
+    const room=val("roomNumber");
+
+return `
+
+<div
+class="coupon"
+style="
+--photo:url('${visual.image}');
+--accent:${visual.accent};
+">
+
+${corners()}
+
+<div class="front-photo"></div>
+
+<div class="front-curve"></div>
+
+<div class="event-badge">
+
+<div class="event-badge-inner"></div>
+
+<div class="event-badge-text">
+${badgeText()}
+</div>
+
+</div>
+
+<div class="left-details">
+
+<div class="left-group">
+${esc(val("groupName"))}
+</div>
+
+<div class="left-line"></div>
+
+<div class="left-meta">
+
+${esc(visual.label)}
+
+<br>
+
+${esc(val("location"))}
+
+<br>
+
+${esc(val("eventDates"))}
+
+</div>
+
+</div>
+
+<div class="front-main">
+
+<div class="front-watermark"></div>
+
+<div class="brand"><img class="official-logo" src="../assets/branding/courtyard-logo.webp" alt="Courtyard by Marriott"></div>
+
+<div class="gold-divider"></div>
+
+<div class="eyebrow">
+EXCLUSIVELY FOR ${esc(val("groupName"))}
+</div>
+
+<div class="main-title">
+${title.top}
+</div>
+
+<div class="main-title-gold">
+${title.bottom}
+</div>
+
+<div class="entitlement-frame">
+
+<div class="entitlement">
+
+<div class="entitlement-left">
+
+${type==="Breakfast" ? "BREAKFAST SERVICE" : "WITH OUR COMPLIMENTS"}
+
+<strong>
+${esc(val("redeemDate") || val("eventDates"))}
+</strong>
+
+</div>
+
+<div class="entitlement-right">
+${detailRight}
+</div>
+
+</div>
+
+</div>
+
+<div class="hospitality-line">
+
+${type==="Breakfast"
+? "A wonderful start to your day."
+: "A little something to enjoy during your stay."}
+
+</div>
+
+<div class="small-divider"></div>
+
+<div class="restrictions">
+
+${restrictions}
+
+${room ? `<br>ROOM ${esc(room)}` : ""}
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+/* =========================================================
+   BACK MESSAGE
+========================================================= */
+
+function backHeadline(){
+
+    if(val("eventType")==="Wedding"){
+        return "Celebrate.<br>Love beautifully.";
+    }
+
+    if(val("couponType")==="Breakfast"){
+        return "Start well.<br>Enjoy your day.";
+    }
+
+    if(val("eventType")==="Social Event"){
+        return "Sip.<br>Celebrate.";
+    }
+
+    return "With Our<br>Compliments.";
+}
+
+/* =========================================================
+   BACK
+========================================================= */
+
+function makeBack(){
+
+    const visual=currentVisual();
+
+return `
+
+<div
+class="coupon coupon-back"
+style="
+--photo:url('${visual.image}');
+--accent:${visual.accent};
+">
+
+${corners()}
+
+<div class="back-watermark"></div>
+
+<div class="back-content">
+
+<div class="back-brand"><img class="official-logo" src="../assets/branding/courtyard-logo.webp" alt="Courtyard by Marriott"></div>
+
+<div class="gold-divider"></div>
+
+<div class="back-eyebrow">
+COURTYARD CARROLLTON WELCOMES
+</div>
+
+<div class="back-title">
+${backHeadline()}
+</div>
+
+<div class="back-message">
+
+Thank you for being part of
+
+<br>
+
+<strong>
+the Courtyard family.
+</strong>
+
+</div>
+
+<div class="small-divider"></div>
+
+<div class="back-group">
+
+${esc(val("groupName"))}
+
+<br>
+
+${esc(val("eventDates"))}
+
+&nbsp; • &nbsp;
+
+${esc(val("location"))}
+
+</div>
+
+<div class="back-custom">
+${esc(val("customMessage"))}
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+/* =========================================================
+   SHOW / HIDE FIELDS
+========================================================= */
+
+function updateFields(){
+
+    const type=val("couponType");
+
+    const drinkBox=document.getElementById("drinkBox");
+    const customBox=document.getElementById("customDrinkBox");
+    const timeBox=document.getElementById("timeBox");
+
+    if(type==="Breakfast"){
+
+        drinkBox.style.display="none";
+        customBox.style.display="none";
+        timeBox.style.display="block";
+
+    }else{
+
+        drinkBox.style.display="block";
+        timeBox.style.display="none";
+
+        customBox.style.display=
+            val("drinkChoice")==="Custom"
+            ? "block"
+            : "none";
+
+    }
+
+}
+
+/* =========================================================
+   LIVE PREVIEW
+========================================================= */
+
+function updateTool(){
+
+    updateFields();
+
+    document.getElementById("previewTitle")
+        .textContent=
+        val("groupName") || "Event Coupon";
+
+    document.getElementById("frontPreview")
+        .innerHTML=makeFront();
+
+    document.getElementById("backPreview")
+        .innerHTML=makeBack();
+
+    buildPrint();
+
+}
+
+/* =========================================================
+   CROP MARKS
+========================================================= */
+
+function cropMarks(){
+
+return `
+<span class="crop tl-h"></span>
+<span class="crop tl-v"></span>
+
+<span class="crop tr-h"></span>
+<span class="crop tr-v"></span>
+
+<span class="crop bl-h"></span>
+<span class="crop bl-v"></span>
+
+<span class="crop br-h"></span>
+<span class="crop br-v"></span>
+`;
+
+}
+
+/* =========================================================
+   PRINT SLOT
+========================================================= */
+
+function printSlot(html){
+
+return `
+
+<div class="print-slot">
+
+${cropMarks()}
+
+<div class="print-coupon-shell">
+${html}
+</div>
+
+</div>
+
+`;
+
+}
+
+function emptySlot(){
+
+return `
+
+<div class="print-slot">
+
+${cropMarks()}
+
+</div>
+
+`;
+
+}
+
+function printPage(cards){
+
+return `
+
+<section class="print-page">
+${cards.join("")}
+</section>
+
+`;
+
+}
+
+/* =========================================================
+   BUILD PRINT
+
+   8 FRONT CARDS
+   THEN MATCHING 8 BACK CARDS
+
+   REPEATS IF QUANTITY > 8
+========================================================= */
+
+function buildPrint(){
+
+    const area=document.getElementById("printArea");
+
+    area.innerHTML="";
+
+    let remaining=
+        parseInt(val("quantity")) || 1;
+
+    while(remaining>0){
+
+        const count=Math.min(6,remaining);
+
+        const fronts=[];
+        const backs=[];
+
+        for(let i=0;i<count;i++){
+
+            fronts.push(
+                printSlot(makeFront())
+            );
+
+            backs.push(
+                printSlot(makeBack())
+            );
+
+        }
+
+        while(fronts.length<6){
+            fronts.push(emptySlot());
+        }
+
+        while(backs.length<6){
+            backs.push(emptySlot());
+        }
+
+        area.insertAdjacentHTML(
+            "beforeend",
+            printPage(fronts)
+        );
+
+        area.insertAdjacentHTML(
+            "beforeend",
+            printPage([backs[1],backs[0],backs[3],backs[2],backs[5],backs[4]])
+        );
+
+        remaining-=count;
+
+    }
+
+}
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+function printCoupons(){
+
+    updateTool();
+
+    if(!val("groupName")){
+
+        alert("Please enter a group or event name.");
+
+        return;
+    }
+
+    window.print();
+
+}
+
+/* =========================================================
+   LIVE EVENTS
+========================================================= */
+
+document
+.querySelectorAll("input,select")
+.forEach(element=>{
+
+    element.addEventListener(
+        "input",
+        updateTool
+    );
+
+    element.addEventListener(
+        "change",
+        updateTool
+    );
+
+});
+
+/* START */
+
+updateTool();
+
+</script>
+
+<script>document.getElementById("imageMode").addEventListener("change",function(){document.body.classList.toggle("ink-saver",this.value==="ink")});window.addEventListener("beforeprint",updateTool);</script>
+</body>
+</html>

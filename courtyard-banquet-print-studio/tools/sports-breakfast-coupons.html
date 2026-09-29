@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Courtyard Sports Breakfast Coupon Tool</title>
+
+<style>
+
+/* ==========================================================
+   COLORS
+========================================================== */
+
+:root{
+    --gold:#B88A3B;
+    --gold2:#D8BC7A;
+    --ivory:#FCF8EF;
+    --ink:#142B39;
+    --navy:#213E4F;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+html,body{
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:#EAE7E0;
+    color:var(--ink);
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+
+/* ==========================================================
+   EDITOR
+========================================================== */
+
+.editor{
+    background:#213E4F;
+    color:#fff;
+    padding:14px 4%;
+    box-shadow:0 5px 18px rgba(0,0,0,.16);
+}
+
+.editor-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.editor-heading h1{
+    margin:0;
+    font-family:Georgia,"Times New Roman",serif;
+    font-weight:400;
+    font-size:23px;
+}
+
+.editor-heading span{
+    color:#E7CA8A;
+    font-size:9px;
+    letter-spacing:3px;
+}
+
+.fields{
+    display:grid;
+    grid-template-columns:1.3fr .75fr .9fr 1.15fr 1fr 1fr;
+    gap:9px;
+}
+
+.field label{
+    display:block;
+    margin-bottom:4px;
+    color:#F1E8D5;
+    font-size:8px;
+    font-weight:bold;
+    letter-spacing:1.2px;
+}
+
+.field input,
+.field select{
+    width:100%;
+    height:35px;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:4px;
+    background:#fff;
+    color:#152A36;
+    padding:7px 9px;
+    font-size:12px;
+}
+
+.schedule-heading{
+    color:#E7CA8A;
+    margin:14px 0 7px;
+    font-size:9px;
+    letter-spacing:2px;
+}
+
+.days{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:9px;
+}
+
+.day{
+    padding:9px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:5px;
+    background:rgba(255,255,255,.07);
+}
+
+.day-heading{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-bottom:5px;
+    font-size:9px;
+    font-weight:bold;
+    letter-spacing:1px;
+}
+
+.day input[type="text"],
+.day input[type="number"]{
+    width:100%;
+    border:0;
+    border-radius:3px;
+    padding:7px;
+    margin-top:4px;
+}
+
+.time-row{
+    display:grid;
+    grid-template-columns:1fr 66px;
+    gap:5px;
+}
+
+.actions{
+    display:flex;
+    gap:9px;
+    margin-top:12px;
+}
+
+button{
+    border:0;
+    border-radius:4px;
+    padding:11px 19px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.update-btn{
+    color:#fff;
+    background:#C49747;
+}
+
+.print-btn{
+    background:#fff;
+    color:#18303E;
+}
+
+
+/* ==========================================================
+   PREVIEW
+========================================================== */
+
+.preview-title{
+    text-align:center;
+    padding:25px 10px 13px;
+}
+
+.preview-title small{
+    color:var(--gold);
+    letter-spacing:4px;
+    font-size:8px;
+}
+
+.preview-title h2{
+    margin:7px 0 0;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:30px;
+    font-weight:400;
+}
+
+.preview-grid{
+    width:min(1280px,95%);
+    margin:0 auto 50px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:27px;
+}
+
+.preview-label{
+    text-align:center;
+    color:#766B5B;
+    font-size:8px;
+    letter-spacing:3px;
+    margin-bottom:8px;
+}
+
+
+/* ==========================================================
+   COUPON
+========================================================== */
+
+.coupon{
+    position:relative;
+    width:100%;
+    aspect-ratio:1.53846 / 1;
+    overflow:hidden;
+    background:var(--ivory);
+    border:2px solid var(--gold);
+
+    box-shadow:
+        0 15px 35px rgba(36,28,17,.14);
+
+    --photo:url("../assets/sports/soccer.jpg");
+}
+
+.coupon::after{
+    content:"";
+    position:absolute;
+    inset:9px;
+    border:1px solid rgba(183,137,63,.78);
+    z-index:60;
+    pointer-events:none;
+}
+
+
+/* ==========================================================
+   GOLD CORNERS
+========================================================== */
+
+.corner{
+    position:absolute;
+    width:17px;
+    height:17px;
+    z-index:65;
+}
+
+.corner.tl{
+    left:10px;
+    top:10px;
+    border-left:2px solid var(--gold);
+    border-top:2px solid var(--gold);
+}
+
+.corner.tr{
+    right:10px;
+    top:10px;
+    border-right:2px solid var(--gold);
+    border-top:2px solid var(--gold);
+}
+
+.corner.bl{
+    left:10px;
+    bottom:10px;
+    border-left:2px solid var(--gold);
+    border-bottom:2px solid var(--gold);
+}
+
+.corner.br{
+    right:10px;
+    bottom:10px;
+    border-right:2px solid var(--gold);
+    border-bottom:2px solid var(--gold);
+}
+
+
+/* ==========================================================
+   FRONT PHOTO
+========================================================== */
+
+.front-photo{
+    position:absolute;
+    inset:0 auto 0 0;
+    width:40%;
+    z-index:1;
+
+    background-image:
+        linear-gradient(
+            180deg,
+            rgba(3,25,22,.12),
+            rgba(3,25,22,.34)
+        ),
+        var(--photo);
+
+    background-size:cover;
+    background-position:center;
+}
+
+.front-photo::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(1,18,16,.32),
+            transparent 58%
+        ),
+        linear-gradient(
+            0deg,
+            rgba(1,18,16,.30),
+            transparent 55%
+        );
+}
+
+
+/* ==========================================================
+   CURVED DIVIDER
+========================================================== */
+
+.front-curve{
+    position:absolute;
+    z-index:7;
+    left:32%;
+    top:-13%;
+    width:18%;
+    height:126%;
+
+    border-left:3px solid var(--gold);
+    border-right:1px solid var(--gold2);
+
+    border-radius:50% 0 0 50%;
+    background:var(--ivory);
+    transform:rotate(1.5deg);
+
+    box-shadow:
+        -4px 0 0 rgba(220,196,142,.33);
+}
+
+
+/* ==========================================================
+   TEAM CREST
+========================================================== */
+
+.crest-position{
+    position:absolute;
+    z-index:20;
+    left:18%;
+    top:10%;
+    transform:translateX(-50%);
+}
+
+.crest{
+    width:91px;
+    height:105px;
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(5,32,28,.68);
+
+    clip-path:polygon(
+        50% 0,
+        94% 15%,
+        90% 70%,
+        50% 100%,
+        10% 70%,
+        6% 15%
+    );
+
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));
+}
+
+.crest::before{
+    content:"";
+    position:absolute;
+    inset:2px;
+    border:3px solid #E9D5A3;
+    clip-path:inherit;
+}
+
+.crest::after{
+    content:"";
+    position:absolute;
+    inset:8px;
+    border:1px solid rgba(255,255,255,.85);
+    clip-path:inherit;
+}
+
+.crest-initials{
+    position:relative;
+    z-index:3;
+    max-width:72px;
+    color:#fff;
+    font-weight:bold;
+    line-height:.9;
+    text-align:center;
+    text-shadow:0 2px 5px rgba(0,0,0,.45);
+}
+
+.crest-star{
+    position:absolute;
+    z-index:4;
+    bottom:17px;
+    color:#E5BF69;
+    font-size:12px;
+}
+
+
+/* ==========================================================
+   TEAM INFORMATION
+========================================================== */
+
+.front-team{
+    position:absolute;
+    z-index:20;
+    left:4%;
+    top:49%;
+    width:27%;
+    text-align:center;
+    color:#fff;
+    text-transform:uppercase;
+    text-shadow:0 2px 5px rgba(0,0,0,.7);
+}
+
+.front-division{
+    font-size:10px;
+    line-height:1.55;
+    font-weight:bold;
+    letter-spacing:3px;
+}
+
+.team-line{
+    width:48px;
+    height:1px;
+    margin:9px auto;
+    background:var(--gold);
+}
+
+.front-location{
+    font-size:7px;
+    line-height:1.6;
+    letter-spacing:2.4px;
+}
+
+
+/* ==========================================================
+   FRONT MAIN
+========================================================== */
+
+.front-main{
+    position:absolute;
+    z-index:10;
+    left:40%;
+    right:0;
+    top:0;
+    bottom:0;
+    padding:7% 5% 3% 2%;
+    text-align:center;
+}
+
+.front-watermark{
+    position:absolute;
+    z-index:-1;
+    right:-6%;
+    top:5%;
+    width:44%;
+    height:54%;
+    opacity:.045;
+    filter:grayscale(100%) contrast(80%);
+    background-image:var(--photo);
+    background-size:cover;
+    background-position:center;
+    border-radius:50%;
+}
+
+
+/* ==========================================================
+   BRAND
+========================================================== */
+
+.brand{
+    color:var(--gold);
+    font-size:20px;
+    font-weight:bold;
+    line-height:1;
+    letter-spacing:6px;
+}
+
+.brand-sub{
+    margin-top:4px;
+    color:#111;
+    font-size:5.5px;
+    font-weight:bold;
+    letter-spacing:1.1px;
+}
+
+.gold-divider{
+    position:relative;
+    width:180px;
+    height:1px;
+    margin:17px auto 13px;
+    background:var(--gold2);
+}
+
+.gold-divider::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:-4px;
+    width:8px;
+    height:8px;
+    background:var(--gold);
+    transform:translateX(-50%) rotate(45deg);
+}
+
+
+/* ==========================================================
+   TITLE
+========================================================== */
+
+.breakfast{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:37px;
+    line-height:.96;
+}
+
+.coupon-word{
+    margin-top:5px;
+    color:var(--gold);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:42px;
+    line-height:.96;
+    letter-spacing:8px;
+}
+
+
+/* ==========================================================
+   SERVICE BOX
+========================================================== */
+
+.service-frame{
+    position:relative;
+    width:91%;
+    margin:22px auto 0;
+    padding:5px;
+    border:2px solid var(--gold);
+}
+
+.service-frame::after{
+    content:"";
+    position:absolute;
+    inset:4px;
+    border:1px solid var(--gold2);
+    pointer-events:none;
+}
+
+.service{
+    min-height:67px;
+    display:grid;
+    grid-template-columns:48% 52%;
+    align-items:center;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(6,51,42,.98) 0%,
+            rgba(23,76,61,.96) 44%,
+            rgba(248,243,232,.96) 73%
+        );
+}
+
+.service-date{
+    padding:5px;
+    border-right:1px solid var(--gold);
+    color:#fff;
+    text-transform:uppercase;
+    font-size:8px;
+    line-height:1.45;
+    letter-spacing:2px;
+}
+
+.calendar-icon{
+    display:block;
+    margin-bottom:3px;
+    color:#D7B56A;
+    font-size:14px;
+}
+
+.service-date strong{
+    display:block;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:12px;
+    letter-spacing:1px;
+}
+
+.service-time{
+    color:var(--ink);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:17px;
+}
+
+.clock-icon{
+    margin-right:6px;
+    color:var(--gold);
+    font-size:18px;
+}
+
+
+/* ==========================================================
+   FRONT FOOTER
+========================================================== */
+
+.instructions{
+    margin-top:12px;
+    color:#5C5348;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:8px;
+    font-style:italic;
+}
+
+.small-divider{
+    position:relative;
+    width:180px;
+    height:1px;
+    margin:11px auto 7px;
+    background:var(--gold2);
+}
+
+.small-divider::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:-3px;
+    width:7px;
+    height:7px;
+    background:var(--gold);
+    transform:rotate(45deg);
+}
+
+.valid{
+    font-size:5.5px;
+    line-height:1.55;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+
+
+/* ==========================================================
+   BACK
+========================================================== */
+
+.coupon-back{
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #FFFDF8 0%,
+            var(--ivory) 54%,
+            #F4EAD8 100%
+        );
+}
+
+.back-photo-watermark{
+    position:absolute;
+    z-index:1;
+    right:-4%;
+    bottom:-15%;
+    width:58%;
+    height:88%;
+
+    background-image:var(--photo);
+    background-size:cover;
+    background-position:center;
+
+    opacity:.075;
+
+    filter:
+        grayscale(100%)
+        sepia(18%)
+        contrast(80%);
+
+    -webkit-mask-image:
+        radial-gradient(
+            ellipse at center,
+            #000 0%,
+            rgba(0,0,0,.85) 30%,
+            transparent 72%
+        );
+
+    mask-image:
+        radial-gradient(
+            ellipse at center,
+            #000 0%,
+            rgba(0,0,0,.85) 30%,
+            transparent 72%
+        );
+}
+
+.back-glow{
+    position:absolute;
+    z-index:2;
+    left:-7%;
+    top:-20%;
+    width:50%;
+    height:85%;
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(217,190,130,.16),
+            transparent 68%
+        );
+}
+
+.back-content{
+    position:absolute;
+    z-index:10;
+    inset:0;
+    padding:7% 11% 5%;
+    text-align:center;
+}
+
+.back-brand{
+    color:var(--gold);
+    font-size:19px;
+    font-weight:bold;
+    letter-spacing:6px;
+}
+
+.back-brand-sub{
+    margin-top:4px;
+    color:#111;
+    font-size:5.5px;
+    font-weight:bold;
+    letter-spacing:1.1px;
+}
+
+.back-title{
+    margin-top:26px;
+    color:var(--gold);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:41px;
+    line-height:1.12;
+    font-style:italic;
+}
+
+.back-message{
+    margin-top:16px;
+    color:var(--ink);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:19px;
+    line-height:1.25;
+}
+
+.back-message strong{
+    font-size:21px;
+}
+
+.back-team{
+    margin-top:22px;
+    color:#655D52;
+    font-size:7px;
+    line-height:1.75;
+    letter-spacing:3px;
+    text-transform:uppercase;
+}
+
+.back-wish{
+    margin-top:18px;
+    color:#4F4A43;
+    font-size:7px;
+    line-height:1.7;
+    letter-spacing:3px;
+    text-transform:uppercase;
+}
+
+
+/* ==========================================================
+   PRINT AREA
+========================================================== */
+
+#printArea{
+    display:none;
+}
+
+
+/* ==========================================================
+   PRINT PAGE
+
+   US LETTER = 8.5 x 11
+
+   8 COUPONS
+   2 COLUMNS x 4 ROWS
+
+   FINISHED SIZE:
+   3.60" x 2.34"
+
+   REAL CUTTING SPACE BETWEEN CARDS
+========================================================== */
+
+.print-page{
+    width:8.5in;
+    height:11in;
+    position:relative;
+    background:#fff;
+
+    display:grid;
+
+    grid-template-columns:
+        3.60in
+        3.60in;
+
+    grid-template-rows:
+        repeat(4,2.34in);
+
+    column-gap:.28in;
+    row-gap:.18in;
+
+    justify-content:center;
+    align-content:start;
+
+    padding-top:.40in;
+    padding-bottom:.40in;
+
+    page-break-after:always;
+    break-after:page;
+
+    overflow:hidden;
+}
+
+
+/* ==========================================================
+   PRINT SLOT
+========================================================== */
+
+.print-slot{
+    position:relative;
+    width:3.60in;
+    height:2.34in;
+    overflow:visible;
+}
+
+
+/* ==========================================================
+   PRINT COUPON SHELL
+========================================================== */
+
+.print-coupon-shell{
+    position:absolute;
+    left:0;
+    top:0;
+    width:3.60in;
+    height:2.34in;
+    overflow:hidden;
+}
+
+
+/* ==========================================================
+   SCALE MASTER DESIGN
+
+   MASTER = 600 x 390
+   PRINT = 3.60 x 2.34
+========================================================== */
+
+.print-coupon-shell .coupon{
+    position:absolute;
+    left:0;
+    top:0;
+
+    width:600px;
+    height:390px;
+
+    transform:scale(.576);
+    transform-origin:top left;
+
+    box-shadow:none;
+}
+
+
+/* ==========================================================
+   CUTTING MARKS
+========================================================== */
+
+.crop{
+    position:absolute;
+    z-index:1000;
+    pointer-events:none;
+    background:#777;
+}
+
+.crop.tl-h,
+.crop.bl-h{
+    width:.12in;
+    height:.5px;
+    left:-.14in;
+}
+
+.crop.tr-h,
+.crop.br-h{
+    width:.12in;
+    height:.5px;
+    right:-.14in;
+}
+
+.crop.tl-h,
+.crop.tr-h{
+    top:0;
+}
+
+.crop.bl-h,
+.crop.br-h{
+    bottom:0;
+}
+
+.crop.tl-v,
+.crop.tr-v{
+    width:.5px;
+    height:.12in;
+    top:-.14in;
+}
+
+.crop.bl-v,
+.crop.br-v{
+    width:.5px;
+    height:.12in;
+    bottom:-.14in;
+}
+
+.crop.tl-v,
+.crop.bl-v{
+    left:0;
+}
+
+.crop.tr-v,
+.crop.br-v{
+    right:0;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:1050px){
+
+    .fields{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .days{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .preview-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+
+/* ==========================================================
+   PRINT
+========================================================== */
+
+@media print{
+
+    @page{
+        size:Letter portrait;
+        margin:0;
+    }
+
+    html,
+    body{
+        width:8.5in!important;
+        margin:0!important;
+        padding:0!important;
+        background:#fff!important;
+    }
+
+    .editor,
+    .preview-title,
+    .preview-grid{
+        display:none!important;
+    }
+
+    #printArea{
+        display:block!important;
+        margin:0!important;
+        padding:0!important;
+    }
+
+    .print-page{
+        margin:0!important;
+    }
+
+    .coupon{
+        -webkit-print-color-adjust:exact!important;
+        print-color-adjust:exact!important;
+    }
+}
+
+</style>
+<link rel="stylesheet" href="../assets/coupon-print.css">
+</head>
+
+
+<body>
+<nav class="studio-nav"><a href="../index.html">← Banquet Print Studio</a></nav>
+
+
+<!-- ==========================================================
+     EDITOR
+========================================================== -->
+
+<section class="editor">
+
+<div class="editor-heading">
+
+<h1>Sports Team Breakfast Coupons</h1>
+
+<span>COURTYARD • PREMIUM MASTER</span>
+
+</div>
+
+
+<div class="fields">
+
+<div class="field">
+<label>TEAM NAME</label>
+<input id="team" value="WSA Girls ECNL & RL">
+</div>
+
+<div class="field">
+<label>SHORT NAME / INITIALS</label>
+<input id="short" value="WSA">
+</div>
+
+<div class="field">
+<label>SPORT</label>
+
+<select id="sport">
+<option>Soccer</option>
+<option>Pickleball</option>
+<option>Hockey</option>
+<option>Basketball</option>
+<option>Volleyball</option>
+<option>Baseball / Softball</option>
+</select>
+
+</div>
+
+<div class="field">
+<label>DIVISION / CATEGORY</label>
+<input id="division" value="Girls ECNL & RL">
+</div>
+
+<div class="field">
+<label>LOCATION</label>
+<input id="location" value="Dallas, TX">
+</div>
+
+<div class="field">
+<label>TRIP DATES</label>
+<input id="trip" value="Sept 25-27, 2026">
+</div>
+
+</div>
+
+
+<div class="schedule-heading">
+BREAKFAST SCHEDULE • CHECK ONLY THE DAYS YOU NEED
+</div>
+
+
+<div class="days">
+
+<!-- DAY 1 -->
+
+<div class="day">
+
+<div class="day-heading">
+<input type="checkbox" id="use1" checked>
+DAY 1
+</div>
+
+<input
+id="day1"
+type="text"
+value="Saturday, September 26">
+
+<div class="time-row">
+
+<input
+id="time1"
+type="text"
+value="7:00 AM - 9:00 AM">
+
+<input
+id="qty1"
+type="number"
+value="8"
+min="1">
+
+</div>
+</div>
+
+
+<!-- DAY 2 -->
+
+<div class="day">
+
+<div class="day-heading">
+<input type="checkbox" id="use2" checked>
+DAY 2
+</div>
+
+<input
+id="day2"
+type="text"
+value="Sunday, September 27">
+
+<div class="time-row">
+
+<input
+id="time2"
+type="text"
+value="7:00 AM - 9:00 AM">
+
+<input
+id="qty2"
+type="number"
+value="8"
+min="1">
+
+</div>
+</div>
+
+
+<!-- DAY 3 -->
+
+<div class="day">
+
+<div class="day-heading">
+<input type="checkbox" id="use3">
+DAY 3 • OPTIONAL
+</div>
+
+<input
+id="day3"
+type="text"
+placeholder="Monday, September 28">
+
+<div class="time-row">
+
+<input
+id="time3"
+type="text"
+placeholder="7:00 AM - 9:00 AM">
+
+<input
+id="qty3"
+type="number"
+value="8"
+min="1">
+
+</div>
+</div>
+
+
+<!-- DAY 4 -->
+
+<div class="day">
+
+<div class="day-heading">
+<input type="checkbox" id="use4">
+DAY 4 • OPTIONAL
+</div>
+
+<input
+id="day4"
+type="text"
+placeholder="Tuesday, September 29">
+
+<div class="time-row">
+
+<input
+id="time4"
+type="text"
+placeholder="7:00 AM - 9:00 AM">
+
+<input
+id="qty4"
+type="number"
+value="8"
+min="1">
+
+</div>
+</div>
+
+</div>
+
+
+<div class="duplex-help"><label for="imageMode">IMAGE MODE</label><select id="imageMode"><option value="premium">Premium Image</option><option value="ink">Ink Saver / No Image</option></select><p>6 coupons per US Letter sheet · 2 columns × 3 rows.<br>Print double-sided, <strong>flip on long edge</strong>, at <strong>100% / Actual size</strong>. Turn off headers/footers and enable background graphics. Each front page is followed by its matching back page. Empty positions move to the opposite column on the back so partial sheets cut correctly.</p></div><div class="actions">
+
+<button
+class="update-btn"
+onclick="updateTool()">
+Update Coupons
+</button>
+
+<button
+class="print-btn"
+onclick="printCoupons()">
+Print / Save PDF
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ==========================================================
+     PREVIEW
+========================================================== -->
+
+<div class="preview-title">
+
+<small>LIVE PREVIEW</small>
+
+<h2 id="previewTitle">
+WSA Girls ECNL & RL
+</h2>
+
+</div>
+
+
+<div class="preview-grid">
+
+<div>
+
+<div class="preview-label">
+FRONT
+</div>
+
+<div id="frontPreview"></div>
+
+</div>
+
+
+<div>
+
+<div class="preview-label">
+BACK
+</div>
+
+<div id="backPreview"></div>
+
+</div>
+
+</div>
+
+
+<!-- ==========================================================
+     PRINT AREA
+========================================================== -->
+
+<div id="printArea"></div>
+
+
+<script>
+
+/* ==========================================================
+   SPORT IMAGE LIBRARY
+
+   KEEP THESE JPG FILES IN THE SAME FOLDER AS THIS HTML FILE.
+========================================================== */
+
+const sports={
+
+    "Soccer":{
+        image:"../assets/sports/soccer.jpg",
+        label:"SOCCER"
+    },
+
+    "Pickleball":{
+        image:"../assets/sports/pickleball.jpg",
+        label:"PICKLEBALL"
+    },
+
+    "Hockey":{
+        image:"../assets/sports/hockey.jpg",
+        label:"HOCKEY"
+    },
+
+    "Basketball":{
+        image:"../assets/sports/basketball.jpg",
+        label:"BASKETBALL"
+    },
+
+    "Volleyball":{
+        image:"../assets/sports/volleyball.jpg",
+        label:"VOLLEYBALL"
+    },
+
+    "Baseball / Softball":{
+        image:"../assets/sports/baseball-softball.jpg",
+        label:"BASEBALL / SOFTBALL"
+    }
+
+};
+
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+function value(id){
+
+    return document
+        .getElementById(id)
+        .value
+        .trim();
+
+}
+
+
+function esc(text){
+
+    return String(text)
+
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+
+}
+
+
+/* ==========================================================
+   DATE SPLITTER
+========================================================== */
+
+function parseDate(text){
+
+    const comma=text.indexOf(",");
+
+    if(comma>-1){
+
+        return{
+
+            day:
+                text
+                .substring(0,comma)
+                .trim(),
+
+            date:
+                text
+                .substring(comma+1)
+                .trim()
+
+        };
+
+    }
+
+    return{
+        day:"",
+        date:text
+    };
+
+}
+
+
+/* ==========================================================
+   CREST FONT SIZE
+========================================================== */
+
+function crestSize(){
+
+    const length=value("short").length;
+
+    if(length<=3){
+        return "27px";
+    }
+
+    if(length<=5){
+        return "20px";
+    }
+
+    if(length<=8){
+        return "15px";
+    }
+
+    return "11px";
+
+}
+
+
+/* ==========================================================
+   GOLD CORNERS
+========================================================== */
+
+function corners(){
+
+return `
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+`;
+
+}
+
+
+/* ==========================================================
+   FRONT COUPON
+========================================================== */
+
+function makeFront(dayText,timeText){
+
+    const sport=sports[value("sport")];
+    const d=parseDate(dayText);
+
+return `
+
+<div
+class="coupon coupon-front"
+style="--photo:url('${sport.image}');">
+
+${corners()}
+
+<div class="front-photo"></div>
+
+<div class="front-curve"></div>
+
+
+<div class="crest-position">
+
+<div class="crest">
+
+<div
+class="crest-initials"
+style="font-size:${crestSize()};">
+
+${esc(value("short"))}
+
+</div>
+
+<div class="crest-star">
+★
+</div>
+
+</div>
+
+</div>
+
+
+<div class="front-team">
+
+<div class="front-division">
+${esc(value("division"))}
+</div>
+
+<div class="team-line"></div>
+
+<div class="front-location">
+
+${esc(value("location"))}
+
+<br>
+
+${esc(value("trip"))}
+
+</div>
+
+</div>
+
+
+<div class="front-main">
+
+<div class="front-watermark"></div>
+
+<div class="brand">
+COURTYARD
+</div>
+
+<div class="brand-sub">
+BY MARRIOTT
+</div>
+
+<div class="gold-divider"></div>
+
+<div class="breakfast">
+Breakfast
+</div>
+
+<div class="coupon-word">
+COUPON
+</div>
+
+
+<div class="service-frame">
+
+<div class="service">
+
+<div class="service-date">
+
+<span class="calendar-icon">
+▣
+</span>
+
+${esc(d.day)}
+
+<strong>
+${esc(d.date)}
+</strong>
+
+</div>
+
+
+<div class="service-time">
+
+<span class="clock-icon">
+◷
+</span>
+
+${esc(timeText)}
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="instructions">
+Present this coupon during the breakfast service listed above.
+</div>
+
+<div class="small-divider"></div>
+
+<div class="valid">
+
+VALID ONLY FOR THE NAMED TEAM AND DATE.
+
+<br>
+
+ONE-TIME USE.
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* ==========================================================
+   BACK COUPON
+========================================================== */
+
+function makeBack(){
+
+    const sport=sports[value("sport")];
+
+return `
+
+<div
+class="coupon coupon-back"
+style="--photo:url('${sport.image}');">
+
+${corners()}
+
+<div class="back-photo-watermark"></div>
+
+<div class="back-glow"></div>
+
+<div class="back-content">
+
+<div class="back-brand">
+COURTYARD
+</div>
+
+<div class="back-brand-sub">
+BY MARRIOTT
+</div>
+
+<div class="gold-divider"></div>
+
+<div class="back-title">
+
+Fuel up.
+
+<br>
+
+Play strong.
+
+</div>
+
+<div class="back-message">
+
+Thank you for being part of
+
+<br>
+
+<strong>
+the Courtyard family.
+</strong>
+
+</div>
+
+<div class="small-divider"></div>
+
+<div class="back-team">
+
+${esc(value("team"))}
+
+<br>
+
+${sport.label}
+
+&nbsp; • &nbsp;
+
+${esc(value("location"))}
+
+</div>
+
+<div class="back-wish">
+
+WISHING YOU A GREAT WEEKEND
+
+<br>
+
+AND A GREAT GAME.
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* ==========================================================
+   ACTIVE DAYS
+========================================================== */
+
+function activeDays(){
+
+    const result=[];
+
+    for(let i=1;i<=4;i++){
+
+        const checked=
+            document
+            .getElementById("use"+i)
+            .checked;
+
+        const day=value("day"+i);
+
+        const time=value("time"+i);
+
+        const qty=
+            parseInt(
+                value("qty"+i)
+            ) || 1;
+
+        if(
+            checked &&
+            day &&
+            time
+        ){
+
+            result.push({
+                day:day,
+                time:time,
+                qty:qty
+            });
+
+        }
+
+    }
+
+    return result;
+
+}
+
+
+/* ==========================================================
+   LIVE PREVIEW
+========================================================== */
+
+function updateTool(){
+
+    const team=
+        value("team") ||
+        "Sports Team";
+
+    document
+        .getElementById("previewTitle")
+        .textContent=team;
+
+
+    const days=activeDays();
+
+    const sample=
+        days.length
+        ?
+        days[0]
+        :
+        {
+            day:"Breakfast Date",
+            time:"Breakfast Time"
+        };
+
+
+    document
+        .getElementById("frontPreview")
+        .innerHTML=
+            makeFront(
+                sample.day,
+                sample.time
+            );
+
+
+    document
+        .getElementById("backPreview")
+        .innerHTML=
+            makeBack();
+
+
+    buildPrint();
+
+}
+
+
+/* ==========================================================
+   CROP MARKS
+========================================================== */
+
+function cropMarks(){
+
+return `
+
+<span class="crop tl-h"></span>
+<span class="crop tl-v"></span>
+
+<span class="crop tr-h"></span>
+<span class="crop tr-v"></span>
+
+<span class="crop bl-h"></span>
+<span class="crop bl-v"></span>
+
+<span class="crop br-h"></span>
+<span class="crop br-v"></span>
+
+`;
+
+}
+
+
+/* ==========================================================
+   PRINT SLOT
+========================================================== */
+
+function printSlot(couponHTML){
+
+return `
+
+<div class="print-slot">
+
+${cropMarks()}
+
+<div class="print-coupon-shell">
+
+${couponHTML}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* ==========================================================
+   EMPTY SLOT
+========================================================== */
+
+function emptySlot(){
+
+return `
+
+<div class="print-slot">
+
+${cropMarks()}
+
+</div>
+
+`;
+
+}
+
+
+/* ==========================================================
+   PRINT PAGE
+========================================================== */
+
+function printPage(cards){
+
+return `
+
+<section class="print-page">
+
+${cards.join("")}
+
+</section>
+
+`;
+
+}
+
+
+/* ==========================================================
+   BUILD PRINT SHEETS
+
+   8 COUPONS PER PAGE
+   2 COLUMNS x 4 ROWS
+
+   FRONT PAGE FIRST
+   MATCHING BACK PAGE SECOND
+
+   IMPORTANT:
+   The back page uses the SAME slot geometry so duplex
+   alignment stays consistent.
+========================================================== */
+
+function buildPrint(){
+
+    const area=
+        document
+        .getElementById("printArea");
+
+    area.innerHTML="";
+
+    const days=activeDays();
+
+
+    days.forEach(info=>{
+
+        let remaining=info.qty;
+
+
+        while(remaining>0){
+
+            const count=
+                Math.min(6,
+                    remaining
+                );
+
+
+            /* ==========================================
+               FRONT PAGE
+            ========================================== */
+
+            const fronts=[];
+
+
+            for(
+                let i=0;
+                i<count;
+                i++
+            ){
+
+                fronts.push(
+
+                    printSlot(
+
+                        makeFront(
+                            info.day,
+                            info.time
+                        )
+
+                    )
+
+                );
+
+            }
+
+
+            while(fronts.length<6){
+
+                fronts.push(
+                    emptySlot()
+                );
+
+            }
+
+
+            area.insertAdjacentHTML(
+
+                "beforeend",
+
+                printPage(fronts)
+
+            );
+
+
+            /* ==========================================
+               BACK PAGE
+            ========================================== */
+
+            const backs=[];
+
+
+            for(
+                let i=0;
+                i<count;
+                i++
+            ){
+
+                backs.push(
+
+                    printSlot(
+                        makeBack()
+                    )
+
+                );
+
+            }
+
+
+            while(backs.length<6){
+
+                backs.push(
+                    emptySlot()
+                );
+
+            }
+
+
+            area.insertAdjacentHTML(
+
+                "beforeend",
+
+                printPage([backs[1],backs[0],backs[3],backs[2],backs[5],backs[4]])
+
+            );
+
+
+            remaining-=count;
+
+        }
+
+    });
+
+}
+
+
+/* ==========================================================
+   PRINT BUTTON
+========================================================== */
+
+function printCoupons(){
+
+    updateTool();
+
+    if(activeDays().length===0){
+
+        alert(
+            "Please select at least one breakfast day and enter its date and time."
+        );
+
+        return;
+
+    }
+
+    window.print();
+
+}
+
+
+/* ==========================================================
+   LIVE UPDATE
+========================================================== */
+
+document
+    .querySelectorAll("input,select")
+    .forEach(element=>{
+
+        element.addEventListener(
+            "input",
+            updateTool
+        );
+
+        element.addEventListener(
+            "change",
+            updateTool
+        );
+
+    });
+
+
+/* ==========================================================
+   START
+========================================================== */
+
+updateTool();
+
+</script>
+
+<script>document.getElementById("imageMode").addEventListener("change",function(){document.body.classList.toggle("ink-saver",this.value==="ink")});window.addEventListener("beforeprint",updateTool);</script>
+</body>
+</html>
