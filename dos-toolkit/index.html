@@ -1,29 +1,163 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DOS Daily Toolkit</title><style>
-body{font-family:Arial,sans-serif;margin:0;background:#f5f6f7;color:#222}header{background:#fff;border-bottom:1px solid #ddd;padding:18px;position:sticky;top:0}.w{max-width:1050px;margin:auto}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.tabs button{padding:9px 12px;border:1px solid #ccc;border-radius:9px;background:#fff;font-weight:700}.tabs .on{background:#7b1f2b;color:#fff}.p{max-width:1050px;margin:18px auto;padding:0 14px 40px}.tab{display:none}.tab.on{display:block}.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.c{background:#fff;border:1px solid #ddd;border-radius:12px;padding:15px}h1{font-size:24px;margin:0}h2{font-size:18px;margin:0 0 10px}.x{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid #eee;line-height:1.35}.x:last-child{border:0}.x input{margin-top:3px}.muted{color:#667085;font-size:13px}.note{background:#fff6dd;padding:10px;border-radius:8px;font-size:13px}textarea,input[type=text]{width:100%;box-sizing:border-box;border:1px solid #ccc;border-radius:8px;padding:9px;margin-top:8px}.row{display:grid;grid-template-columns:1fr 62px 2fr;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #eee}.time{font-weight:700;color:#7b1f2b;display:inline-block;width:66px}
-</style></head><body><header><div class="w"><h1>DOS Daily Toolkit</h1><div class="muted">Courtyard Dallas Carrollton • Daily rhythm, strategy, team direction and month-end readiness</div><div class="tabs"><button class="on" data-t="today">Today</button><button data-t="week">This Week</button><button data-t="r5">Rule of Five</button><button data-t="month">Month-End</button><button data-t="stand">Sales Stand-Up</button></div></div></header><main class="p">
-<section id="today" class="tab on"><div class="g">
-<div class="c"><h2>Morning Control • 15 min</h2><label class="x"><input type=checkbox>Review arrivals, groups, meeting planners and VIPs; confirm Stay comments.</label><label class="x"><input type=checkbox>Check next 7 days for BEO, setup, billing, payment and operational gaps.</label><label class="x"><input type=checkbox>Scan urgent email, RFP/Cvent/MarRFP deadlines and client commitments.</label><label class="x"><input type=checkbox>Write your 3 DOS priorities.</label><textarea placeholder="My top 3 today..."></textarea></div>
-<div class="c"><h2>Lead the Team • 10–15 min</h2><label class="x"><input type=checkbox>Run Sales Stand-Up after hotel stand-up.</label><label class="x"><input type=checkbox>Give Cameron, Stacey and Tania clear owners + deadlines.</label><label class="x"><input type=checkbox>Resolve or assign blockers.</label><div class="note">Leave everyone clear on what matters today. Do not just collect updates.</div></div>
-<div class="c"><h2>DOS Strategy • 20 min</h2><label class="x"><input type=checkbox>Review 30/60/90 days: group base, weak dates and opportunities.</label><label class="x"><input type=checkbox>Review tentative/prospect business that can solve need dates.</label><label class="x"><input type=checkbox>Move at least one account, past group or project today.</label><label class="x"><input type=checkbox>Confirm the team is selling the dates the hotel needs.</label></div>
-<div class="c"><h2>Details & Execution • 20 min</h2><label class="x"><input type=checkbox>Audit one group: contract → STS → BEO → Stay → billing/payment → planner/VIP recognition.</label><label class="x"><input type=checkbox>Close missing details before they become an operations problem.</label><label class="x"><input type=checkbox>Update next actions with owner + date.</label></div>
-<div class="c"><h2>End-of-Day Reset • 10 min</h2><label class="x"><input type=checkbox>What moved today? What did not?</label><label class="x"><input type=checkbox>Move unfinished items to a named owner + date.</label><label class="x"><input type=checkbox>Log anything that counts toward Rule of Five/month-end.</label><textarea placeholder="Carry forward / tomorrow..."></textarea></div>
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DOS Daily Toolkit</title>
+<style>
+:root{--wine:#7b1f2b;--bg:#f5f6f7;--card:#fff;--line:#ddd;--muted:#667085;--soft:#f7edef;--gold:#fff6dd}
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:var(--bg);color:#222}
+header{background:#fff;border-bottom:1px solid var(--line);padding:18px;position:sticky;top:0;z-index:10}
+.w{max-width:1050px;margin:auto}h1{font-size:24px;margin:0}.muted{color:var(--muted);font-size:13px}
+.todayline{margin-top:7px;font-weight:700;color:var(--wine)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.tabs button{padding:9px 12px;border:1px solid #ccc;border-radius:9px;background:#fff;font-weight:700;cursor:pointer}.tabs .on{background:var(--wine);color:#fff}
+.p{max-width:1050px;margin:18px auto;padding:0 14px 40px}.tab{display:none}.tab.on{display:block}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:12px}.c{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}
+.hero{background:linear-gradient(135deg,#fff,#faf4f5);border:1px solid #e3cbd0}.hero h2{color:var(--wine)}
+h2{font-size:18px;margin:0 0 10px}h3{font-size:15px;margin:14px 0 6px}
+.x{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid #eee;line-height:1.35}.x:last-child{border:0}.x input{margin-top:3px}
+.note{background:var(--gold);padding:10px;border-radius:8px;font-size:13px}.focus{background:var(--soft);padding:11px;border-radius:9px;margin:8px 0}
+.task{border-left:4px solid var(--wine);padding:8px 10px;margin:9px 0;background:#fafafa;border-radius:4px}
+.task b{display:block;margin-bottom:3px}
+textarea,input[type=text]{width:100%;border:1px solid #ccc;border-radius:8px;padding:9px;margin-top:8px;font:inherit}
+.progress{height:9px;background:#eceff2;border-radius:99px;overflow:hidden;margin-top:10px}.bar{height:100%;background:var(--wine);width:0}
+.row{display:grid;grid-template-columns:1fr 62px 2fr;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #eee}
+.time{font-weight:700;color:var(--wine);display:inline-block;width:66px}
+.badge{display:inline-block;background:var(--wine);color:#fff;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}
+@media(max-width:650px){.row{grid-template-columns:1fr 58px}.row input[type=text]{grid-column:1/3}}
+</style></head>
+<body>
+<header><div class="w"><h1>DOS Daily Toolkit</h1><div class="muted">Courtyard Dallas Carrollton • Strategy, team direction, details and month-end readiness</div><div id="todayline" class="todayline"></div>
+<div class="tabs"><button class="on" data-t="today">Today</button><button data-t="week">Weekly Rhythm</button><button data-t="month">Month Progress</button><button data-t="stand">Sales Stand-Up</button></div></div></header>
+<main class="p">
+
+<section id="today" class="tab on">
+<div class="c hero">
+<span class="badge" id="dayBadge"></span>
+<h2 id="dayTitle" style="margin-top:10px"></h2>
+<div id="dayFocus" class="focus"></div>
+<div id="dynamicDaily"></div>
+</div>
+
+<div class="g" style="margin-top:12px">
+<div class="c"><h2>Morning Control • 15 min</h2>
+<label class="x"><input type=checkbox data-k="arrivals">Review today’s arrivals, groups, meeting planners and VIPs; confirm Stay comments / recognition notes.</label>
+<label class="x"><input type=checkbox data-k="seven">Check the next 7 days for BEO, setup, billing, payment and operational gaps.</label>
+<label class="x"><input type=checkbox data-k="urgent">Scan urgent email, RFP/Cvent/MarRFP deadlines and client commitments due today.</label>
+<label class="x"><input type=checkbox data-k="top3">Write your 3 DOS priorities.</label>
+<textarea data-ktext="top3txt" placeholder="My top 3 today..."></textarea></div>
+
+<div class="c"><h2>Today’s Month-End Builder</h2>
+<div class="muted">Do these now. They roll directly into the month-end sales funnel instead of becoming an end-of-month scramble.</div>
+<div id="builderTasks"></div>
+<div class="progress"><div class="bar" id="builderBar"></div></div>
+<div class="muted" id="builderStatus" style="margin-top:5px"></div>
+</div>
+
+<div class="c"><h2>Lead the Team • 10–15 min</h2>
+<label class="x"><input type=checkbox data-k="standup">Run the quick Sales Stand-Up after hotel stand-up.</label>
+<label class="x"><input type=checkbox data-k="owners">Give Cameron, Stacey and Tania specific owners + deadlines.</label>
+<label class="x"><input type=checkbox data-k="blockers">Resolve, assign or escalate blockers.</label>
+<div class="note">The stand-up should end with direction, not just updates.</div></div>
+
+<div class="c"><h2>DOS Strategy • 20 min</h2>
+<label class="x"><input type=checkbox data-k="306090">Look 30 / 60 / 90 days ahead: weak dates, group base, pace and opportunities.</label>
+<label class="x"><input type=checkbox data-k="tentative">Review tentative/prospect business that can solve need dates.</label>
+<label class="x"><input type=checkbox data-k="moveone">Move at least one account, past group or project today.</label>
+<label class="x"><input type=checkbox data-k="needdate">Confirm the team is selling the dates the hotel actually needs.</label></div>
+
+<div class="c"><h2>Details & Execution • 20 min</h2>
+<label class="x"><input type=checkbox data-k="audit">Audit one upcoming group: contract → STS → BEO → Stay → billing/payment → planner/VIP recognition.</label>
+<label class="x"><input type=checkbox data-k="closegap">Close missing details before they become a Front Desk or Banquet problem.</label>
+<label class="x"><input type=checkbox data-k="nextaction">Update next actions with owner + date.</label></div>
+
+<div class="c"><h2>End-of-Day Reset • 10 min</h2>
+<label class="x"><input type=checkbox data-k="moved">What moved today? What did not?</label>
+<label class="x"><input type=checkbox data-k="carry">Move unfinished work to a named owner + date.</label>
+<label class="x"><input type=checkbox data-k="logged">Make sure today’s Builder items have usable notes/outcomes.</label>
+<textarea data-ktext="eod" placeholder="Carry forward / tomorrow..."></textarea></div>
 </div></section>
+
 <section id="week" class="tab"><div class="g">
-<div class="c"><h2>Monday • Control the Week</h2><label class="x"><input type=checkbox>Sales scrub: upcoming groups, VIPs/planners, payments, BEOs, pickup and risks.</label><label class="x"><input type=checkbox>Review 30/60/90-day base + need dates.</label><label class="x"><input type=checkbox>Assign corporate/account targets.</label><label class="x"><input type=checkbox>Review MarRFP items and deadlines.</label></div>
-<div class="c"><h2>Tuesday • Prospect & Convert</h2><label class="x"><input type=checkbox>Work past groups, lost business and target accounts.</label><label class="x"><input type=checkbox>Push tentative/prospect opportunities with a specific next action.</label><label class="x"><input type=checkbox>Advance Rule of Five categories.</label></div>
-<div class="c"><h2>Wednesday • Revenue Day</h2><label class="x"><input type=checkbox>Review Ian's SMART/revenue packet and forecast.</label><label class="x"><input type=checkbox>Review STR: occupancy, ADR, RevPAR indexes and changes.</label><label class="x"><input type=checkbox>Review segmentation, pace and need dates; turn findings into assignments.</label><label class="x"><input type=checkbox>Review next 7–14 days of groups/BEOs.</label></div>
-<div class="c"><h2>Thursday • Pipeline & Quality</h2><label class="x"><input type=checkbox>Review definite/tentative/prospect pipeline and stale follow-ups.</label><label class="x"><input type=checkbox>Check Cvent/RFP/MarRFP rebids and deadlines.</label><label class="x"><input type=checkbox>Audit contracts, BEOs, billing/payment and Stay flags.</label><label class="x"><input type=checkbox>Coach one recurring team gap.</label></div>
-<div class="c"><h2>Friday • Close & Prepare</h2><label class="x"><input type=checkbox>Review weekly revenue goal tracker + bookings.</label><label class="x"><input type=checkbox>Check Rule of Five/month-end gaps.</label><label class="x"><input type=checkbox>Review next week's arrivals, tours, meetings and deadlines.</label><label class="x"><input type=checkbox>Write next week's top 3 priorities.</label></div>
+<div class="c"><h2>Monday • Control the Week</h2><p class="muted">Set priorities before the week starts controlling you.</p><label class="x"><input type=checkbox>Sales scrub: groups, VIPs/planners, payments, BEOs, pickup and risks.</label><label class="x"><input type=checkbox>Review 30/60/90-day base + need dates.</label><label class="x"><input type=checkbox>Assign corporate/account targets.</label><label class="x"><input type=checkbox>Review MarRFP items and deadlines.</label></div>
+<div class="c"><h2>Tuesday • Prospect & Convert</h2><label class="x"><input type=checkbox>Work past groups, lost business and target accounts.</label><label class="x"><input type=checkbox>Push tentative/prospect opportunities with a specific next action.</label><label class="x"><input type=checkbox>Make focused outside-sales / relationship progress.</label></div>
+<div class="c"><h2>Wednesday • Revenue & Strategy</h2><label class="x"><input type=checkbox>Review Ian’s SMART/revenue packet and forecast.</label><label class="x"><input type=checkbox>Review STR: occupancy, ADR, RevPAR indexes and changes.</label><label class="x"><input type=checkbox>Review segmentation, pace and need dates; turn findings into assignments.</label><label class="x"><input type=checkbox>Review next 7–14 days of groups/BEOs.</label></div>
+<div class="c"><h2>Thursday • Pipeline & Quality</h2><label class="x"><input type=checkbox>Review definite/tentative/prospect pipeline and stale follow-ups.</label><label class="x"><input type=checkbox>Check Cvent/RFP/MarRFP rebids and deadlines.</label><label class="x"><input type=checkbox>Audit contracts, BEOs, billing/payment and Stay flags.</label><label class="x"><input type=checkbox>Coach one recurring team detail gap.</label></div>
+<div class="c"><h2>Friday • Close & Prepare</h2><label class="x"><input type=checkbox>Review weekly revenue goal tracker + bookings.</label><label class="x"><input type=checkbox>Check Month-End Builder progress and gaps.</label><label class="x"><input type=checkbox>Review next week’s arrivals, tours, meetings and deadlines.</label><label class="x"><input type=checkbox>Write next week’s top 3 priorities.</label></div>
 </div></section>
-<section id="r5" class="tab"><div class="c"><h2>Rule of Five</h2><div class="muted">Build these during the month so month-end is mostly done before it arrives.</div><div id="rules"></div></div></section>
-<section id="month" class="tab"><div class="g">
-<div class="c"><h2>Performance & Revenue</h2><label class="x"><input type=checkbox>Actual vs Budget vs Prior Year</label><label class="x"><input type=checkbox>Monthly STR + weekly commentary</label><label class="x"><input type=checkbox>Segmentation month + YTD</label><label class="x"><input type=checkbox>Top accounts MTD/YTD/STLY</label><label class="x"><input type=checkbox>Top 5 groups by actual pickup</label></div>
-<div class="c"><h2>Catering & Pace</h2><label class="x"><input type=checkbox>Banquet actual vs budget vs prior year</label><label class="x"><input type=checkbox>Future 3-month banquet pace</label><label class="x"><input type=checkbox>Extended-stay occupancy/ADR TY vs PY</label></div>
-<div class="c"><h2>Sales Funnel</h2><label class="x"><input type=checkbox>5 previously housed groups</label><label class="x"><input type=checkbox>5 currently contracted groups</label><label class="x"><input type=checkbox>5 in-house leads</label><label class="x"><input type=checkbox>5 target special corporate accounts</label><label class="x"><input type=checkbox>5 target projects</label><label class="x"><input type=checkbox>5 VIP clients/relationship contacts</label><label class="x"><input type=checkbox>Site tours/client meetings/outside sales/networking outcomes</label></div>
-<div class="c"><h2>Month-End QA</h2><label class="x"><input type=checkbox>Real outcomes or next actions—not just “follow up.”</label><label class="x"><input type=checkbox>Numbers reconcile to correct month-end snapshot.</label><label class="x"><input type=checkbox>Every target has owner + next date.</label><label class="x"><input type=checkbox>Answer: What happened? Why? What are we doing next?</label></div>
+
+<section id="month" class="tab">
+<div class="c"><h2 id="monthTitle">Month Progress</h2><div class="muted">The target is five usable entries in each funnel category. The daily Builder feeds this automatically.</div><div id="rules"></div><div class="progress"><div class="bar" id="rulebar"></div></div><div class="muted" id="rulestatus" style="margin-top:6px"></div></div>
+<div class="g" style="margin-top:12px">
+<div class="c"><h2>Performance & Revenue — month-end QA</h2><label class="x"><input type=checkbox>Actual vs Budget vs Prior Year</label><label class="x"><input type=checkbox>Monthly STR + weekly commentary</label><label class="x"><input type=checkbox>Segmentation month + YTD</label><label class="x"><input type=checkbox>Top accounts MTD / YTD / STLY</label><label class="x"><input type=checkbox>Top 5 groups by actual pickup</label></div>
+<div class="c"><h2>Catering & Pace — month-end QA</h2><label class="x"><input type=checkbox>Banquet actual vs budget vs prior year</label><label class="x"><input type=checkbox>Future 3-month banquet pace snapshot</label><label class="x"><input type=checkbox>Extended-stay occupancy / ADR TY vs PY</label></div>
+<div class="c"><h2>Final QA</h2><label class="x"><input type=checkbox>Every entry has a real outcome or next action.</label><label class="x"><input type=checkbox>Numbers reconcile to the correct month-end snapshot/source.</label><label class="x"><input type=checkbox>Every target has an owner and next date.</label><label class="x"><input type=checkbox>Draft narrative: What happened? Why? What are we doing next?</label></div>
 </div></section>
-<section id="stand" class="tab"><div class="c"><h2>10–15 Minute Sales Stand-Up</h2><p><span class="time">0–2</span><b>Today:</b> top 3 priorities, one sentence each.</p><p><span class="time">2–5</span><b>Due:</b> contracts, proposals, RFPs, deposits, BEOs, cutoffs and follow-ups due today/tomorrow.</p><p><span class="time">5–8</span><b>Arrivals:</b> groups/VIPs/planners next 7 days; missing Stay comments, billing, payment, setup, BEO or pickup?</p><p><span class="time">8–11</span><b>Pipeline:</b> one piece of business each person can move today, especially need dates.</p><p><span class="time">11–13</span><b>Blockers:</b> “What do you need from me today?”</p><p><span class="time">13–15</span><b>Close:</b> Yohandra states owners + deadlines.</p><div class="note">Not a full sales meeting. Park anything that needs a longer discussion.</div><textarea placeholder="Cameron — ...&#10;Stacey — ...&#10;Tania — ...&#10;Me — ..."></textarea></div></section>
-</main><script>
-const K='dosToolkit';let s=JSON.parse(localStorage.getItem(K)||'{}');document.querySelectorAll('input[type=checkbox]').forEach((e,i)=>{e.checked=!!s['c'+i];e.onchange=()=>{s['c'+i]=e.checked;localStorage.setItem(K,JSON.stringify(s))}});document.querySelectorAll('textarea').forEach((e,i)=>{e.value=s['t'+i]||'';e.oninput=()=>{s['t'+i]=e.value;localStorage.setItem(K,JSON.stringify(s))}});document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button,.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById(b.dataset.t).classList.add('on')});
-const n=['Previously housed groups','Currently contracted groups','In-house leads','Target special corporate accounts','Target projects','VIP clients / relationship contacts','Site tours / client meetings / outside sales / networking'];let r=document.getElementById('rules');n.forEach((x,i)=>{let d=document.createElement('div');d.className='row';d.innerHTML='<b>'+x+'</b><input type="number" min="0" max="5" value="'+(s['r'+i]||0)+'"><input type="text" placeholder="Names / progress / next action" value="'+(s['rn'+i]||'')+'">';let a=d.querySelectorAll('input');a[0].oninput=()=>{s['r'+i]=Math.max(0,Math.min(5,+a[0].value||0));localStorage.setItem(K,JSON.stringify(s))};a[1].oninput=()=>{s['rn'+i]=a[1].value;localStorage.setItem(K,JSON.stringify(s))};r.appendChild(d)});
+
+<section id="stand" class="tab"><div class="c"><h2>10–15 Minute Sales Stand-Up</h2>
+<p><span class="time">0–2</span><b>Today:</b> top 3 priorities, one sentence each.</p>
+<p><span class="time">2–5</span><b>Due:</b> contracts, proposals, RFPs, deposits, BEOs, cutoffs and follow-ups due today/tomorrow.</p>
+<p><span class="time">5–8</span><b>Arrivals:</b> groups/VIPs/planners next 7 days; missing Stay comments, billing, payment, setup, BEO or pickup?</p>
+<p><span class="time">8–11</span><b>Pipeline:</b> one piece of business each person can move today, especially a need date.</p>
+<p><span class="time">11–13</span><b>Blockers:</b> “What do you need from me today?”</p>
+<p><span class="time">13–15</span><b>Close:</b> Yohandra states owners + deadlines.</p>
+<div class="note">Not a full sales meeting. Anything that needs a longer discussion gets parked for a separate conversation.</div>
+<textarea data-ktext="teamdir" placeholder="Cameron — ...&#10;Stacey — ...&#10;Tania — ...&#10;Me — ..."></textarea></div></section>
+</main>
+
+<script>
+const now=new Date(), day=now.getDay(), dateKey=now.toISOString().slice(0,10), monthKey=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+const weekday=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][day];
+const dateLabel=now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+document.getElementById('todayline').textContent=dateLabel;
+document.getElementById('dayBadge').textContent=weekday;
+document.getElementById('monthTitle').textContent=now.toLocaleDateString(undefined,{month:'long',year:'numeric'})+' Progress';
+
+const dayPlans={
+1:{title:'Control the Week',focus:'Set the week before the week sets you. Scrub upcoming business, identify need dates, assign account priorities and make sure the team knows what must be closed.',tasks:['Complete/lead the weekly sales scrub.','Review 30/60/90-day group base and identify the dates the team must sell.','Check open MarRFP/RFP deadlines and assign ownership.']},
+2:{title:'Prospect & Convert',focus:'Today is about movement. Work past groups, target accounts and tentative business instead of getting trapped only in operations.',tasks:['Choose past/repeat business to reactivate.','Advance tentative/prospect business with a real next action and deadline.','Complete one meaningful relationship/outside-sales action.']},
+3:{title:'Revenue & Strategy',focus:'Read the business, then tell the team what to do because of it. Revenue reports should change your sales behavior.',tasks:['Review the SMART/revenue packet and current forecast.','Review STR results and identify what changed in occupancy, ADR and RevPAR indexes.','Translate need dates/pace into specific sales assignments.']},
+4:{title:'Pipeline & Quality',focus:'Make sure the pipeline is real and the details are clean. Thursday is your quality-control day.',tasks:['Review definite/tentative/prospect business and stale follow-ups.','Check Cvent/RFP/MarRFP rebids and deadlines.','Audit one upcoming contract/BEO/Stay/billing/payment file end-to-end.']},
+5:{title:'Close & Prepare',focus:'Finish the week deliberately. Know what booked, what did not move, and what next week needs before you leave.',tasks:['Review weekly revenue goal tracker and bookings.','Review next week’s arrivals, tours, meetings and deadlines.','Write next week’s top 3 DOS priorities and any team follow-ups.']},
+0:{title:'Weekend View',focus:'No scheduled DOS cadence today. Use this only if you are working or want to preview Monday.',tasks:['Preview Monday’s arrivals and urgent deadlines only if needed.']},
+6:{title:'Weekend View',focus:'No scheduled DOS cadence today. Use this only if you are working or want to preview Monday.',tasks:['Preview Monday’s arrivals and urgent deadlines only if needed.']}
+};
+const plan=dayPlans[day];document.getElementById('dayTitle').textContent=plan.title;document.getElementById('dayFocus').textContent=plan.focus;
+document.getElementById('dynamicDaily').innerHTML=plan.tasks.map(t=>'<label class="x"><input type="checkbox" data-dynamic="'+t.replace(/"/g,'')+'">'+t+'</label>').join('');
+
+const cats=[
+ {name:'Previously housed groups', action:'Choose one previously housed group. Confirm the last program/date, whether they can return, and write the next outreach action.'},
+ {name:'Currently contracted groups', action:'Review one currently contracted group. Capture why it matters, future/repeat potential and the next relationship action.'},
+ {name:'In-house leads', action:'Capture one in-house/recent lead with rate or value, outcome and a specific follow-up for future business.'},
+ {name:'Target special corporate accounts', action:'Work one target special corporate account. Record market opportunity, contact progress and the next pursuit step.'},
+ {name:'Target projects', action:'Work one local project. Identify the project/company/contact opportunity and the next action for crews, meetings or transient demand.'},
+ {name:'VIP clients / relationship contacts', action:'Advance one VIP/client relationship. Add or confirm contacts and record what you did to deepen the relationship.'},
+ {name:'Site tours / client meetings / outside sales / networking', action:'Complete or log one sales activity with a real outcome: contacts made, business discussed, booking progress or next step.'}
+];
+
+function businessDayIndex(d){
+ let n=0; for(let x=new Date(d.getFullYear(),d.getMonth(),1);x<=d;x.setDate(x.getDate()+1)){let gd=x.getDay(); if(gd!==0&&gd!==6)n++} return n;
+}
+const bdi=businessDayIndex(now), start=(bdi-1)*2, builder=document.getElementById('builderTasks');
+let todays=[];
+if(day!==0&&day!==6 && start<35){todays=[start,start+1].filter(i=>i<35);}
+if(day!==0&&day!==6 && start>=35){builder.innerHTML='<div class="note"><b>Builder is complete for this month.</b> Use today to fill any missing names, verify outcomes and reconcile the month-end report.</div>';}
+else if(day===0||day===6){builder.innerHTML='<div class="note">No new Builder assignment on weekends. Your progress is saved for the next business day.</div>';}
+else{
+ builder.innerHTML=todays.map(i=>{const c=cats[i%7],round=Math.floor(i/7)+1;return '<div class="task"><b>'+c.name+' • #'+round+' of 5</b>'+c.action+'<label class="x"><input type="checkbox" data-build="'+i+'">Done and documented</label></div>'}).join('');
+}
+const K='dosToolkitV2_'+monthKey; let s={}; try{s=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
+document.querySelectorAll('input[data-k]').forEach(e=>{const k=dateKey+'_'+e.dataset.k;e.checked=!!s[k];e.onchange=()=>{s[k]=e.checked;save();}});
+document.querySelectorAll('input[data-dynamic]').forEach((e,i)=>{const k=dateKey+'_dyn'+i;e.checked=!!s[k];e.onchange=()=>{s[k]=e.checked;save();}});
+document.querySelectorAll('[data-ktext]').forEach(e=>{const k=dateKey+'_'+e.dataset.ktext;e.value=s[k]||'';e.oninput=()=>{s[k]=e.value;save();}});
+document.querySelectorAll('input[data-build]').forEach(e=>{const k='build_'+e.dataset.build;e.checked=!!s[k];e.onchange=()=>{s[k]=e.checked;save();renderProgress();}});
+function save(){localStorage.setItem(K,JSON.stringify(s));}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button,.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById(b.dataset.t).classList.add('on')});
+
+const rules=document.getElementById('rules');cats.forEach((c,ci)=>{let d=document.createElement('div');d.className='row';d.innerHTML='<b>'+c.name+'</b><div id="count'+ci+'">0 / 5</div><input type="text" id="note'+ci+'" placeholder="Names / progress / next action">';rules.appendChild(d);let inp=d.querySelector('input');inp.value=s['catnote_'+ci]||'';inp.oninput=()=>{s['catnote_'+ci]=inp.value;save();};});
+function renderProgress(){
+ let total=0;
+ cats.forEach((c,ci)=>{let count=0;for(let i=ci;i<35;i+=7)if(s['build_'+i])count++;total+=count;document.getElementById('count'+ci).textContent=count+' / 5';});
+ let pct=Math.round(total/35*100);document.getElementById('rulebar').style.width=pct+'%';document.getElementById('rulestatus').textContent=total+' of 35 Rule-of-Five entries completed • '+pct+'%';
+ let dayDone=todays.filter(i=>s['build_'+i]).length;document.getElementById('builderBar').style.width=(todays.length?Math.round(dayDone/todays.length*100):100)+'%';
+ document.getElementById('builderStatus').textContent=todays.length?(dayDone+' of '+todays.length+' Builder items complete today'):(start>=35?'Month Builder complete — QA/fill gaps':'No weekend Builder assignment');
+}
+renderProgress();
 </script></body></html>
