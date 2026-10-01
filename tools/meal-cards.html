@@ -699,6 +699,20 @@ h1{
 }
 </style>
 <link rel="stylesheet" href="../assets/refinements.css?v=4">
+
+<style>
+/* Buffet-only editing and typography; physical card and sheet sizes are unchanged. */
+.buffet-fields{margin-top:10px}
+.buffet-fields label{display:block;font-size:10px;font-weight:bold;margin:9px 0 5px}
+.buffet-fields input{width:100%;min-width:0;padding:8px;border:1px solid #b9ab89;border-radius:3px;font:12px Arial,sans-serif}
+.buffet-help{font-size:11px;color:#ddd8ce;margin:0 0 12px}
+.buffet-card .buffet-info{min-width:0;min-height:0}
+.buffet-card .buffet-brand{margin-bottom:7px;flex:none}
+.buffet-card .buffet-name{width:100%;font-size:26px;line-height:1.08;overflow-wrap:anywhere;text-wrap:balance;flex:none}
+.buffet-card .buffet-category{font: bold 11px/1.2 Arial,sans-serif;color:var(--meal);margin-top:7px;flex:none}
+.buffet-card .buffet-description{width:100%;font-size:10px;line-height:1.2;overflow-wrap:anywhere;margin-top:5px;flex:none}
+.buffet-card .buffet-description:empty{display:none}
+</style>
 </head>
 
 <body>
@@ -758,6 +772,8 @@ h1{
        THESE ARE HARD-CODED.
        THEY WILL ALWAYS SHOW.
   ================================================== -->
+
+  <p id="buffetHelp" class="buffet-help" hidden>Select a dietary/category label, then enter the food item name and quantity. The food name appears above the smaller dietary label. Names: up to 80 characters.</p>
 
   <div class="meal-grid">
 
@@ -1292,6 +1308,48 @@ var mealData = {
 
 var currentMode = "table";
 
+// Keep buffet wording separate so table meal cards retain their approved text.
+Object.keys(mealData).forEach(function(id){
+  var fields = document.createElement("div");
+  fields.className = "buffet-fields";
+  fields.hidden = true;
+  fields.innerHTML =
+    '<label for="' + id + 'FoodName">Custom Food Item Name</label>' +
+    '<input id="' + id + 'FoodName" type="text" maxlength="80" placeholder="e.g., Grilled Chicken">' +
+    '<label for="' + id + 'FoodDescription">Short description (optional)</label>' +
+    '<input id="' + id + 'FoodDescription" type="text" maxlength="60" placeholder="e.g., With fresh herbs">';
+  document.getElementById(id + "Qty").closest(".meal-choice").appendChild(fields);
+  fields.addEventListener("input", makeCards);
+});
+
+function escapeBuffetText(value){
+  var node = document.createElement("span");
+  node.textContent = value;
+  return node.innerHTML;
+}
+
+// Fit within the original card at a readable minimum, including in print.
+function fitBuffetNames(){
+  document.querySelectorAll(".buffet-card").forEach(function(card){
+    var info = card.querySelector(".buffet-info");
+    var name = card.querySelector(".buffet-name");
+    var size = 26;
+    name.style.fontSize = size + "px";
+    var padding = parseFloat(getComputedStyle(info).paddingTop) + parseFloat(getComputedStyle(info).paddingBottom);
+    function contentHeight(){
+      return Array.from(info.children).reduce(function(total, child){
+        var style = getComputedStyle(child);
+        return total + child.getBoundingClientRect().height + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+      }, padding);
+    }
+    while(size > 14 && (contentHeight() > info.clientHeight || name.scrollWidth > name.clientWidth)){
+      name.style.fontSize = (--size) + "px";
+    }
+  });
+}
+document.getElementById("preview").addEventListener("load", fitBuffetNames, true);
+window.addEventListener("beforeprint", fitBuffetNames);
+
 
 /* =========================================================
    BASIC CONTROLS
@@ -1360,6 +1418,8 @@ function clearEverything(){
 function changeMode(mode){
 
   currentMode = mode;
+  document.querySelectorAll(".buffet-fields").forEach(function(fields){ fields.hidden = mode !== "buffet"; });
+  document.getElementById("buffetHelp").hidden = mode !== "buffet";
 
   var table =
     document.getElementById("tableButton");
@@ -1437,9 +1497,16 @@ function getCards(){
         quantity = 1;
       }
 
+      var card = mealData[id];
+      if(currentMode === "buffet"){
+        card = Object.assign({}, card, {
+          foodName: document.getElementById(id + "FoodName").value.trim(),
+          foodDescription: document.getElementById(id + "FoodDescription").value.trim()
+        });
+      }
       for(var q=0;q<quantity;q++){
         cards.push(
-          mealData[id]
+          card
         );
       }
     }
@@ -1584,11 +1651,15 @@ function buffetCard(meal){
         '</div>' +
 
         '<div class="buffet-name">' +
+        escapeBuffetText(meal.foodName || "Food Item Name") +
+        '</div>' +
+
+        '<div class="buffet-category">' +
         meal.name +
         '</div>' +
 
         '<div class="buffet-description">' +
-        meal.description +
+        escapeBuffetText(meal.foodDescription || "") +
         '</div>' +
 
       '</div>' +
@@ -1747,6 +1818,7 @@ function makeCards(){
     buildTablePages(cards);
   }else{
     buildBuffetPages(cards);
+    fitBuffetNames();
   }
 }
 
