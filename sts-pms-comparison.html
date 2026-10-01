@@ -11,7 +11,7 @@
 @media(max-width:850px){.upload,.beo-grid{grid-template-columns:1fr}.group{min-width:190px}main{padding:12px}header{padding:14px}}
 @media print{@page{size:letter landscape;margin:0.25in}body{background:#fff}.screen-only,header,.hero,.controls,.stats,details,dialog{display:none!important}.print-only{display:block}.print-page{page-break-after:always}.print-page:last-child{page-break-after:auto}.print-page h2{font-size:13px;margin:0 0 3px}.print-page p{font-size:8px;margin:0 0 5px}.print-table{font-size:7.2px;width:100%;table-layout:fixed}.print-table th,.print-table td{padding:2.4px 2px;border:1px solid #d6dce4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.print-table .pg{text-align:left;width:22%;white-space:normal}.print-table th{position:static;background:#263f60!important;color:#fff}.print-table .pms{background:#edf4fb!important}.print-table .diff{background:#fde9e7!important;color:#8c2924}.print-table .total td{background:#dce8f3!important}.print-table small{font-size:6.2px;display:block}.print-all-only{display:block}}
 </style></head><body>
-<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-10-01d</span></div><a href="../index.html" style="color:#244b78">← Banquet Tools</a></header>
+<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-10-01e</span></div><a href="../index.html" style="color:#244b78">← Banquet Tools</a></header>
 <main>
 <div class="tool-switch screen-only"><button id="showBeo" class="active">BEO Cleaner</button><button id="showPickup">STS ↔ Stay PMS Comparison</button></div>
 <section id="beoTool" class="beo-card screen-only"><div class="section-title">BEO CLEANER</div><h1>Clean STS BEO PDF</h1><p>Remove the standard STS legal acknowledgment, tax disclaimer, and Sertifi signature/date footer from an unsigned BEO PDF while keeping event details, charges, totals, and page order.</p><div class="beo-grid"><label class="filebox"><b>Choose unsigned STS BEO PDF</b><input id="beoFile" type="file" accept=".pdf,application/pdf"></label><button class="primary" id="cleanBeo">Clean BEO</button></div><div class="privacy">The PDF is processed in this browser. The original file is never changed. Review the cleaned copy before sending it to the client.</div><div id="beoMsg" class="beo-result"></div></section>
@@ -68,7 +68,7 @@ async function cleanBeoPdf(file){
  const jsBuffer=await file.arrayBuffer();
  const loading=pdfjsLib.getDocument({data:new Uint8Array(jsBuffer)});const src=await loading.promise;
  if(out.isEncrypted)throw Error('This PDF is password protected. Export an unlocked STS PDF first.');
- let legalHits=0,taxHits=0,sigBlocks=0,changed=new Set(),warnings=[];
+ let legalHits=0,taxHits=0,sigBlocks=0,changed=new Set(),warnings=[],removePages=[];
  for(let pn=1;pn<=src.numPages;pn++){
   const pg=await src.getPage(pn),tc=await pg.getTextContent(),items=tc.items.filter(x=>x.str&&x.str.trim()),ph=pg.getViewport({scale:1}).height;
   let stream='',map=[];
@@ -104,14 +104,26 @@ async function cleanBeoPdf(file){
     const pt=viewport.convertToViewportPoint(it.transform[4]||0,it.transform[5]||0);
     return pt[1]<cutoffTop-3 && !selected.has(i);
   }).map(x=>x.str.trim()).filter(Boolean);
-  if(!meaningfulAbove.length)warnings.push(`Page ${pn}: footer-only page was blanked; page retained to preserve original page order.`);
+
+  // If cleaning leaves only the repeated hotel masthead/logo text, this was a
+  // footer-only overflow page. Remove it from the final batch instead of keeping
+  // an awkward blank page.
+  const boilerplate=/^(courtyard|by marriott|courtyard carrollton and carrollton conference center|1201 raiford road,? carrollton,? tx 75007|972[-–]446[-–]0001?\s*\|?\s*972[-–]446[-–]0012)$/i;
+  const substantive=meaningfulAbove.filter(t=>!boilerplate.test(t.replace(/\s+/g,' ').trim()));
+  const substantiveText=substantive.join(' ').replace(/\s+/g,' ').trim();
+  if(substantiveText.length<40){
+    removePages.push(pn-1);
+    warnings.push(`Page ${pn}: removed because only the hotel masthead/footer remained after cleaning.`);
+  }
  }
- const data=await out.save();return {data,report:{input_pages:src.numPages,output_pages:out.getPageCount(),matches:{legal:legalHits,tax:taxHits,signature_blocks:sigBlocks},changed_pages:[...changed],warnings}};
+ // Remove footer-only pages from the end backward so original page indexes stay valid.
+ removePages.sort((a,b)=>b-a).forEach(i=>out.removePage(i));
+ const data=await out.save();return {data,report:{input_pages:src.numPages,output_pages:out.getPageCount(),removed_pages:removePages.map(i=>i+1).sort((a,b)=>a-b),matches:{legal:legalHits,tax:taxHits,signature_blocks:sigBlocks},changed_pages:[...changed],warnings}};
 }
 function beoDownload(bytes,name){const a=document.createElement('a'),u=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}
 function setTool(which){const beo=which==='beo';document.getElementById('beoTool').classList.toggle('hidden',!beo);document.getElementById('pickupTool').classList.toggle('hidden',beo);document.getElementById('app').classList.toggle('hidden',beo||!D);document.getElementById('showBeo').classList.toggle('active',beo);document.getElementById('showPickup').classList.toggle('active',!beo)}
 document.getElementById('showBeo').onclick=()=>setTool('beo');document.getElementById('showPickup').onclick=()=>setTool('pickup');
-document.getElementById('cleanBeo').onclick=async()=>{const f=document.getElementById('beoFile').files[0],m=document.getElementById('beoMsg');if(!f){m.innerHTML='<div class="notice danger">Choose an STS BEO PDF first.</div>';return}try{document.getElementById('cleanBeo').disabled=true;m.innerHTML='<div class="notice">Cleaning and checking the PDF…</div>';const r=await cleanBeoPdf(f),base=f.name.replace(/\.pdf$/i,'');beoDownload(r.data,base+' - Cleaned.pdf');const x=r.report.matches;m.innerHTML=`<div class="notice ok"><b>Cleaned PDF ready.</b><br>${r.report.changed_pages.length} page(s) changed · ${x.legal} legal acknowledgment(s) removed · ${x.tax} tax disclaimer(s) removed · ${x.signature_blocks} signature/footer block(s) removed.${r.report.warnings.length?'<br><span class="mini">'+r.report.warnings.map(esc).join('<br>')+'</span>':''}</div>`}catch(e){m.innerHTML='<div class="notice danger"><b>Could not clean this PDF:</b> '+esc(e.message)+'</div>'}finally{document.getElementById('cleanBeo').disabled=false}};
+document.getElementById('cleanBeo').onclick=async()=>{const f=document.getElementById('beoFile').files[0],m=document.getElementById('beoMsg');if(!f){m.innerHTML='<div class="notice danger">Choose an STS BEO PDF first.</div>';return}try{document.getElementById('cleanBeo').disabled=true;m.innerHTML='<div class="notice">Cleaning and checking the PDF…</div>';const r=await cleanBeoPdf(f),base=f.name.replace(/\.pdf$/i,'');beoDownload(r.data,base+' - Cleaned.pdf');const x=r.report.matches;m.innerHTML=`<div class="notice ok"><b>Cleaned PDF ready.</b><br>${r.report.changed_pages.length} page(s) cleaned · ${r.report.removed_pages?.length||0} blank/footer-only page(s) removed · ${x.legal} legal acknowledgment(s) removed · ${x.tax} tax disclaimer(s) removed · ${x.signature_blocks} signature/footer block(s) removed.${r.report.warnings.length?'<br><span class="mini">'+r.report.warnings.map(esc).join('<br>')+'</span>':''}</div>`}catch(e){m.innerHTML='<div class="notice danger"><b>Could not clean this PDF:</b> '+esc(e.message)+'</div>'}finally{document.getElementById('cleanBeo').disabled=false}};
 
 const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), fmt=n=>n==null?'—':Number(n).toLocaleString('en-US');
 let D=null,P=null,state=null,initialLinks={},currentFingerprint='';
