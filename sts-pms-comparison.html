@@ -11,7 +11,7 @@
 @media(max-width:850px){.upload,.beo-grid{grid-template-columns:1fr}.group{min-width:190px}main{padding:12px}header{padding:14px}}
 @media print{@page{size:letter landscape;margin:0.25in}body{background:#fff}.screen-only,header,.hero,.controls,.stats,details,dialog{display:none!important}.print-only{display:block}.print-page{page-break-after:always}.print-page:last-child{page-break-after:auto}.print-page h2{font-size:13px;margin:0 0 3px}.print-page p{font-size:8px;margin:0 0 5px}.print-table{font-size:7.2px;width:100%;table-layout:fixed}.print-table th,.print-table td{padding:2.4px 2px;border:1px solid #d6dce4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.print-table .pg{text-align:left;width:22%;white-space:normal}.print-table th{position:static;background:#263f60!important;color:#fff}.print-table .pms{background:#edf4fb!important}.print-table .diff{background:#fde9e7!important;color:#8c2924}.print-table .total td{background:#dce8f3!important}.print-table small{font-size:6.2px;display:block}.print-all-only{display:block}}
 </style></head><body>
-<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison</span></div><a href="../index.html" style="color:#244b78">← Banquet Tools</a></header>
+<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-10-01b</span></div><a href="../index.html" style="color:#244b78">← Banquet Tools</a></header>
 <main>
 <div class="tool-switch screen-only"><button id="showBeo" class="active">BEO Cleaner</button><button id="showPickup">STS ↔ Stay PMS Comparison</button></div>
 <section id="beoTool" class="beo-card screen-only"><div class="section-title">BEO CLEANER</div><h1>Clean STS BEO PDF</h1><p>Remove the standard STS legal acknowledgment, tax disclaimer, and Sertifi signature/date footer from an unsigned BEO PDF while keeping event details, charges, totals, and page order.</p><div class="beo-grid"><label class="filebox"><b>Choose unsigned STS BEO PDF</b><input id="beoFile" type="file" accept=".pdf,application/pdf"></label><button class="primary" id="cleanBeo">Clean BEO</button></div><div class="privacy">The PDF is processed in this browser. The original file is never changed. Review the cleaned copy before sending it to the client.</div><div id="beoMsg" class="beo-result"></div></section>
@@ -52,14 +52,21 @@ tax, while all other taxable items are subject to an 8.25% state and local sales
 function beoNorm(s){return String(s||'').replace(/\s+/g,'').toLowerCase()}
 function itemRect(item,pageHeight){const t=item.transform||[1,0,0,1,0,0],x=t[4]||0,y=t[5]||0,h=Math.max(Math.abs(t[3]||0),item.height||8,7),w=Math.max(item.width||0,2);return {x:x-1,y:Math.max(0,y-h-1),w:w+2,h:h+3,top:pageHeight-(y+2),bottom:pageHeight-(y-h-2)}}
 async function cleanBeoPdf(file){
- // Keep independent byte copies. PDF.js may transfer/detach the ArrayBuffer it receives,
- // which can leave PDF-Lib with an empty buffer on large multi-page STS batches.
- const raw=new Uint8Array(await file.arrayBuffer());
- if(raw.length<5 || String.fromCharCode(...raw.slice(0,5))!=='%PDF-')throw Error('This file does not appear to be a valid PDF.');
- const pdfJsBytes=raw.slice();
- const pdfLibBytes=raw.slice();
- const loading=pdfjsLib.getDocument({data:pdfJsBytes});const src=await loading.promise;
- const {PDFDocument,rgb}=PDFLib;const out=await PDFDocument.load(pdfLibBytes,{ignoreEncryption:false});
+ // Read the File twice so PDF.js and PDF-Lib receive completely independent ArrayBuffers.
+ // This avoids transferred/detached buffers on large STS batch PDFs in Chromium.
+ const libBuffer=await file.arrayBuffer();
+ const libCheck=new Uint8Array(libBuffer,0,Math.min(8,libBuffer.byteLength));
+ if(libCheck.length<5 || String.fromCharCode(...libCheck.slice(0,5))!=='%PDF-')throw Error('This file does not appear to be a valid PDF.');
+ const {PDFDocument,rgb}=PDFLib;
+ let out;
+ try{
+   out=await PDFDocument.load(libBuffer,{ignoreEncryption:false,throwOnInvalidObject:false});
+ }catch(e){
+   const sig=Array.from(libCheck).map(b=>b.toString(16).padStart(2,'0')).join(' ');
+   throw Error('PDF-Lib could not open the STS batch ('+file.size.toLocaleString()+' bytes; header '+sig+'). '+e.message);
+ }
+ const jsBuffer=await file.arrayBuffer();
+ const loading=pdfjsLib.getDocument({data:new Uint8Array(jsBuffer)});const src=await loading.promise;
  if(out.isEncrypted)throw Error('This PDF is password protected. Export an unlocked STS PDF first.');
  let legalHits=0,taxHits=0,sigBlocks=0,changed=new Set(),warnings=[];
  for(let pn=1;pn<=src.numPages;pn++){
