@@ -11,7 +11,7 @@
 @media(max-width:850px){.upload,.beo-grid{grid-template-columns:1fr}.group{min-width:190px}main{padding:12px}header{padding:14px}}
 @media print{@page{size:letter landscape;margin:0.25in}body{background:#fff}.screen-only,header,.hero,.controls,.stats,details,dialog{display:none!important}.print-only{display:block}.print-page{page-break-after:always}.print-page:last-child{page-break-after:auto}.print-page h2{font-size:13px;margin:0 0 3px}.print-page p{font-size:8px;margin:0 0 5px}.print-table{font-size:7.2px;width:100%;table-layout:fixed}.print-table th,.print-table td{padding:2.4px 2px;border:1px solid #d6dce4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.print-table .pg{text-align:left;width:22%;white-space:normal}.print-table th{position:static;background:#263f60!important;color:#fff}.print-table .pms{background:#edf4fb!important}.print-table .diff{background:#fde9e7!important;color:#8c2924}.print-table .total td{background:#dce8f3!important}.print-table small{font-size:6.2px;display:block}.print-all-only{display:block}}
 </style></head><body>
-<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-10-01f</span></div><a href="../index.html" style="color:#244b78">← Banquet Tools</a></header>
+<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-10-01g</span></div><a href="../index.html" style="color:#244b78">← Banquet Tools</a></header>
 <main>
 <div class="tool-switch screen-only"><button id="showBeo" class="active">BEO Cleaner</button><button id="showPickup">STS ↔ Stay PMS Comparison</button></div>
 <section id="beoTool" class="beo-card screen-only"><div class="section-title">BEO CLEANER</div><h1>Clean STS BEO PDF</h1><p>Remove the standard STS legal acknowledgment, tax disclaimer, and Sertifi signature/date footer from an unsigned BEO PDF while keeping event details, charges, totals, and page order.</p><div class="beo-grid"><label class="filebox"><b>Choose unsigned STS BEO PDF</b><input id="beoFile" type="file" accept=".pdf,application/pdf"></label><button class="primary" id="cleanBeo">Clean BEO</button></div><div class="privacy">The PDF is processed in this browser. The original file is never changed. Review the cleaned copy before sending it to the client.</div><div id="beoMsg" class="beo-result"></div></section>
@@ -71,6 +71,16 @@ async function cleanBeoPdf(file){
  let legalHits=0,taxHits=0,sigBlocks=0,changed=new Set(),warnings=[],removePages=[];
  for(let pn=1;pn<=src.numPages;pn++){
   const pg=await src.getPage(pn),tc=await pg.getTextContent(),items=tc.items.filter(x=>x.str&&x.str.trim()),ph=pg.getViewport({scale:1}).height;
+
+  // STS sometimes emits a completely empty overflow page that contains only
+  // the Courtyard logo as an image. It has no extractable text at all, so the
+  // footer-removal logic would otherwise skip it.
+  if(items.length===0){
+    removePages.push(pn-1);
+    warnings.push(`Page ${pn}: removed because it contained no extractable BEO content.`);
+    continue;
+  }
+
   let stream='',map=[];
   for(let i=0;i<items.length;i++){const n=beoNorm(items[i].str);for(let k=0;k<n.length;k++)map.push(i);stream+=n}
   const selected=new Set();
