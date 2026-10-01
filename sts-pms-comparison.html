@@ -11,7 +11,7 @@
 @media(max-width:850px){.upload,.beo-grid{grid-template-columns:1fr}.group{min-width:190px}main{padding:12px}header{padding:14px}}
 @media print{@page{size:letter landscape;margin:0.25in}body{background:#fff}.screen-only,header,.hero,.controls,.stats,details,dialog{display:none!important}.print-only{display:block}.print-page{page-break-after:always}.print-page:last-child{page-break-after:auto}.print-page h2{font-size:13px;margin:0 0 3px}.print-page p{font-size:8px;margin:0 0 5px}.print-table{font-size:7.2px;width:100%;table-layout:fixed}.print-table th,.print-table td{padding:2.4px 2px;border:1px solid #d6dce4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.print-table .pg{text-align:left;width:22%;white-space:normal}.print-table th{position:static;background:#263f60!important;color:#fff}.print-table .pms{background:#edf4fb!important}.print-table .diff{background:#fde9e7!important;color:#8c2924}.print-table .total td{background:#dce8f3!important}.print-table small{font-size:6.2px;display:block}.print-all-only{display:block}}
 </style></head><body>
-<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-10-01e</span></div><a href="../index.html" style="color:#244b78">← Banquet Tools</a></header>
+<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-10-01f</span></div><a href="../index.html" style="color:#244b78">← Banquet Tools</a></header>
 <main>
 <div class="tool-switch screen-only"><button id="showBeo" class="active">BEO Cleaner</button><button id="showPickup">STS ↔ Stay PMS Comparison</button></div>
 <section id="beoTool" class="beo-card screen-only"><div class="section-title">BEO CLEANER</div><h1>Clean STS BEO PDF</h1><p>Remove the standard STS legal acknowledgment, tax disclaimer, and Sertifi signature/date footer from an unsigned BEO PDF while keeping event details, charges, totals, and page order.</p><div class="beo-grid"><label class="filebox"><b>Choose unsigned STS BEO PDF</b><input id="beoFile" type="file" accept=".pdf,application/pdf"></label><button class="primary" id="cleanBeo">Clean BEO</button></div><div class="privacy">The PDF is processed in this browser. The original file is never changed. Review the cleaned copy before sending it to the client.</div><div id="beoMsg" class="beo-result"></div></section>
@@ -105,15 +105,35 @@ async function cleanBeoPdf(file){
     return pt[1]<cutoffTop-3 && !selected.has(i);
   }).map(x=>x.str.trim()).filter(Boolean);
 
-  // If cleaning leaves only the repeated hotel masthead/logo text, this was a
-  // footer-only overflow page. Remove it from the final batch instead of keeping
-  // an awkward blank page.
-  const boilerplate=/^(courtyard|by marriott|courtyard carrollton and carrollton conference center|1201 raiford road,? carrollton,? tx 75007|972[-–]446[-–]0001?\s*\|?\s*972[-–]446[-–]0012)$/i;
-  const substantive=meaningfulAbove.filter(t=>!boilerplate.test(t.replace(/\s+/g,' ').trim()));
-  const substantiveText=substantive.join(' ').replace(/\s+/g,' ').trim();
-  if(substantiveText.length<40){
+  // Decide whether any real BEO content remains. STS often leaves a separate
+  // overflow page containing only the Courtyard masthead plus the footer/signature
+  // area. Header text can be split into many tiny PDF text objects, so simple
+  // character-count checks are unreliable.
+  const pageText=meaningfulAbove.join(' ').replace(/\s+/g,' ').trim();
+  const pageNorm=beoNorm(pageText);
+  const realMarkers=[
+    'beo#','beo:','eventdate','account:','groupname:','groupcontact:',
+    'datetimefunctionroomsetupsetforrental','setupinstructions','mealservice',
+    'food:','beverage:','audiovisual','agenda/othernotes','estimatedcharges',
+    'subtotal','roomrental','salescoordinatorcontact','salescontractingcontact'
+  ];
+  const hasRealMarker=realMarkers.some(m=>pageNorm.includes(beoNorm(m)));
+
+  // Also keep genuine continuation pages that may not repeat a section heading,
+  // provided they contain enough non-masthead text.
+  let cleanedText=pageText
+    .replace(/COURTYARD/gi,' ')
+    .replace(/BY MARRIOTT/gi,' ')
+    .replace(/COURTYARD CARROLLTON AND CARROLLTON CONFERENCE CENTER/gi,' ')
+    .replace(/1201 RAIFORD ROAD[,]? CARROLLTON[,]? TX 75007/gi,' ')
+    .replace(/972[-– ]?446[-– ]?0001?\s*[|·]?\s*972[-– ]?446[-– ]?0012/gi,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+  const residualAlpha=cleanedText.replace(/[^A-Za-z0-9]/g,'').length;
+
+  if(!hasRealMarker && residualAlpha<120){
     removePages.push(pn-1);
-    warnings.push(`Page ${pn}: removed because only the hotel masthead/footer remained after cleaning.`);
+    warnings.push(`Page ${pn}: removed because no real BEO content remained after footer cleanup.`);
   }
  }
  // Remove footer-only pages from the end backward so original page indexes stay valid.
