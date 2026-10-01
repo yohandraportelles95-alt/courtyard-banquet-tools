@@ -701,17 +701,22 @@ h1{
 <link rel="stylesheet" href="../assets/refinements.css?v=4">
 
 <style>
-/* Buffet-only editing and typography; physical card and sheet sizes are unchanged. */
-.buffet-fields{margin-top:10px}
-.buffet-fields label{display:block;font-size:10px;font-weight:bold;margin:9px 0 5px}
-.buffet-fields input{width:100%;min-width:0;padding:8px;border:1px solid #b9ab89;border-radius:3px;font:12px Arial,sans-serif}
-.buffet-help{font-size:11px;color:#ddd8ce;margin:0 0 12px}
-.buffet-card .buffet-info{min-width:0;min-height:0}
-.buffet-card .buffet-brand{margin-bottom:7px;flex:none}
-.buffet-card .buffet-name{width:100%;font-size:26px;line-height:1.08;overflow-wrap:anywhere;text-wrap:balance;flex:none}
-.buffet-card .buffet-category{font: bold 11px/1.2 Arial,sans-serif;color:var(--meal);margin-top:7px;flex:none}
-.buffet-card .buffet-description{width:100%;font-size:10px;line-height:1.2;overflow-wrap:anywhere;margin-top:5px;flex:none}
-.buffet-card .buffet-description:empty{display:none}
+/* Custom controls and text fitting never apply to the approved presets. */
+.custom-choice{margin-top:12px;max-width:680px}
+.custom-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.custom-options label{display:block;font-size:11px;font-weight:bold;margin-bottom:5px}
+.custom-options input,.custom-options select{width:100%;min-width:0;padding:8px;border:1px solid #b9ab89;border-radius:3px;font:12px Arial,sans-serif}
+.custom-options .custom-wide{grid-column:1/-1}
+.custom-hint{font-size:11px;color:#ddd8ce;line-height:1.4}
+.custom-card .buffet-info{min-width:0;min-height:0}
+.custom-card .buffet-brand{margin-bottom:7px;flex:none}
+.custom-card .buffet-name{width:100%;font-size:26px;line-height:1.08;overflow-wrap:anywhere;text-wrap:balance;flex:none}
+.custom-card .buffet-category{font:bold 11px/1.2 Arial,sans-serif;color:var(--meal);margin-top:7px;flex:none}
+.custom-card .buffet-description{width:100%;font-size:10px;line-height:1.2;overflow-wrap:anywhere;margin-top:5px;flex:none}
+.custom-card .buffet-description:empty{display:none}
+.custom-card .meal-name{width:100%;line-height:1.08;overflow-wrap:anywhere;text-wrap:balance}
+.custom-card .description{overflow-wrap:anywhere}
+@media(max-width:600px){.custom-options{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -772,8 +777,6 @@ h1{
        THESE ARE HARD-CODED.
        THEY WILL ALWAYS SHOW.
   ================================================== -->
-
-  <p id="buffetHelp" class="buffet-help" hidden>Select a dietary/category label, then enter the food item name and quantity. The food name appears above the smaller dietary label. Names: up to 80 characters.</p>
 
   <div class="meal-grid">
 
@@ -1159,6 +1162,32 @@ h1{
   </div>
 
 
+  <div class="meal-choice custom-choice">
+    <div class="choice-title">
+      <input type="checkbox" id="customCheck" onchange="toggleCustom()">
+      <label for="customCheck" class="choice-name">Custom</label>
+    </div>
+    <p class="custom-hint">Add your own meal or food item name using any existing color/style. Preset cards above keep their original wording and colors.</p>
+    <div class="custom-options">
+      <div>
+        <label for="customStyle">Color / style</label>
+        <select id="customStyle" disabled onchange="makeCards()"></select>
+      </div>
+      <div>
+        <label for="customQty">Quantity</label>
+        <input id="customQty" type="number" min="1" max="99" value="1" disabled oninput="makeCards()">
+      </div>
+      <div class="custom-wide">
+        <label for="customName">Custom Meal / Food Item Name</label>
+        <input id="customName" type="text" maxlength="80" placeholder="e.g., Grilled Chicken" disabled oninput="makeCards()">
+      </div>
+      <div class="custom-wide">
+        <label for="customDescription">Short description (optional)</label>
+        <input id="customDescription" type="text" maxlength="60" placeholder="e.g., With fresh herbs" disabled oninput="makeCards()">
+      </div>
+    </div>
+  </div>
+
   <div class="actions">
 
     <button
@@ -1308,38 +1337,39 @@ var mealData = {
 
 var currentMode = "table";
 
-// Keep buffet wording separate so table meal cards retain their approved text.
 Object.keys(mealData).forEach(function(id){
-  var fields = document.createElement("div");
-  fields.className = "buffet-fields";
-  fields.hidden = true;
-  fields.innerHTML =
-    '<label for="' + id + 'FoodName">Custom Food Item Name</label>' +
-    '<input id="' + id + 'FoodName" type="text" maxlength="80" placeholder="e.g., Grilled Chicken">' +
-    '<label for="' + id + 'FoodDescription">Short description (optional)</label>' +
-    '<input id="' + id + 'FoodDescription" type="text" maxlength="60" placeholder="e.g., With fresh herbs">';
-  document.getElementById(id + "Qty").closest(".meal-choice").appendChild(fields);
-  fields.addEventListener("input", makeCards);
+  var option = document.createElement("option");
+  option.value = id;
+  var colors = {vegetarian:"Sage",vegan:"Forest Green",pescatarian:"Blue",glutenfree:"Gold",dairyfree:"Lavender",nutfree:"Coral",containsnuts:"Rust",spicy:"Burgundy",nopork:"Plum",chef:"Charcoal"};
+  option.textContent = colors[id] + " — " + mealData[id].name;
+  document.getElementById("customStyle").appendChild(option);
 });
 
-function escapeBuffetText(value){
+function toggleCustom(){
+  var enabled = document.getElementById("customCheck").checked;
+  document.querySelectorAll(".custom-options input, .custom-options select").forEach(function(field){
+    field.disabled = !enabled;
+  });
+  makeCards();
+}
+
+function escapeCustomText(value){
   var node = document.createElement("span");
   node.textContent = value;
   return node.innerHTML;
 }
 
-// Fit within the original card at a readable minimum, including in print.
-function fitBuffetNames(){
-  document.querySelectorAll(".buffet-card").forEach(function(card){
-    var info = card.querySelector(".buffet-info");
-    var name = card.querySelector(".buffet-name");
-    var size = 26;
+function fitCustomNames(){
+  document.querySelectorAll(".custom-card .buffet-info, .custom-card .table-content").forEach(function(info){
+    var name = info.querySelector(".buffet-name, .meal-name");
+    var size = info.classList.contains("buffet-info") ? 26 : 24;
     name.style.fontSize = size + "px";
-    var padding = parseFloat(getComputedStyle(info).paddingTop) + parseFloat(getComputedStyle(info).paddingBottom);
+    var style = getComputedStyle(info);
+    var padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
     function contentHeight(){
       return Array.from(info.children).reduce(function(total, child){
-        var style = getComputedStyle(child);
-        return total + child.getBoundingClientRect().height + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+        var childStyle = getComputedStyle(child);
+        return total + child.getBoundingClientRect().height + parseFloat(childStyle.marginTop) + parseFloat(childStyle.marginBottom);
       }, padding);
     }
     while(size > 14 && (contentHeight() > info.clientHeight || name.scrollWidth > name.clientWidth)){
@@ -1347,8 +1377,8 @@ function fitBuffetNames(){
     }
   });
 }
-document.getElementById("preview").addEventListener("load", fitBuffetNames, true);
-window.addEventListener("beforeprint", fitBuffetNames);
+document.getElementById("preview").addEventListener("load", fitCustomNames, true);
+window.addEventListener("beforeprint", fitCustomNames);
 
 
 /* =========================================================
@@ -1418,8 +1448,6 @@ function clearEverything(){
 function changeMode(mode){
 
   currentMode = mode;
-  document.querySelectorAll(".buffet-fields").forEach(function(fields){ fields.hidden = mode !== "buffet"; });
-  document.getElementById("buffetHelp").hidden = mode !== "buffet";
 
   var table =
     document.getElementById("tableButton");
@@ -1497,21 +1525,25 @@ function getCards(){
         quantity = 1;
       }
 
-      var card = mealData[id];
-      if(currentMode === "buffet"){
-        card = Object.assign({}, card, {
-          foodName: document.getElementById(id + "FoodName").value.trim(),
-          foodDescription: document.getElementById(id + "FoodDescription").value.trim()
-        });
-      }
       for(var q=0;q<quantity;q++){
         cards.push(
-          card
+          mealData[id]
         );
       }
     }
   }
 
+  if(document.getElementById("customCheck").checked){
+    var style = mealData[document.getElementById("customStyle").value];
+    var custom = Object.assign({}, style, {
+      custom: true,
+      category: style.name,
+      name: escapeCustomText(document.getElementById("customName").value.trim() || "Custom Meal"),
+      description: escapeCustomText(document.getElementById("customDescription").value.trim())
+    });
+    var count = Math.max(1, Math.min(99, parseInt(document.getElementById("customQty").value, 10) || 1));
+    for(var c=0;c<count;c++) cards.push(custom);
+  }
   return cards;
 }
 
@@ -1580,7 +1612,7 @@ function tableSide(meal,position){
         '</div>' +
 
         '<div class="color-name">' +
-        meal.name +
+        (meal.custom ? meal.category : meal.name) +
         '</div>' +
 
       '</div>' +
@@ -1595,7 +1627,7 @@ function tableCard(meal){
 
   return '' +
 
-  '<div class="tent-wrap">' +
+  '<div class="tent-wrap' + (meal.custom ? ' custom-card' : '') + '">' +
 
     cuts() +
 
@@ -1625,7 +1657,7 @@ function buffetCard(meal){
 
   return '' +
 
-  '<div class="buffet-wrap">' +
+  '<div class="buffet-wrap' + (meal.custom ? ' custom-card' : '') + '">' +
 
     cuts() +
 
@@ -1651,15 +1683,13 @@ function buffetCard(meal){
         '</div>' +
 
         '<div class="buffet-name">' +
-        escapeBuffetText(meal.foodName || "Food Item Name") +
-        '</div>' +
-
-        '<div class="buffet-category">' +
         meal.name +
         '</div>' +
 
+        (meal.custom ? '<div class="buffet-category">' + meal.category + '</div>' : '') +
+
         '<div class="buffet-description">' +
-        escapeBuffetText(meal.foodDescription || "") +
+        meal.description +
         '</div>' +
 
       '</div>' +
@@ -1818,8 +1848,8 @@ function makeCards(){
     buildTablePages(cards);
   }else{
     buildBuffetPages(cards);
-    fitBuffetNames();
   }
+  fitCustomNames();
 }
 
 </script>
