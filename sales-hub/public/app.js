@@ -1,4 +1,4 @@
-import {readWorkbook,dateCell} from './xlsx.js';
+import {readWorkbook,dateCell} from './xlsx.js?v=icons2';
 import {API_URL} from './config.js';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -61,7 +61,7 @@ $('#new-certificate').onclick=()=>{
  requestKey=crypto.randomUUID();
  const form=$('#issue-form');form.reset();form.elements.issuedDate.value=settings.today;const d=new Date(settings.today+'T12:00:00');d.setFullYear(d.getFullYear()+1);form.elements.expires.value=d.toISOString().slice(0,10);form.elements.terms.value=settings.terms;$('#issue-error').textContent='';$('#editor').showModal();
 };
-function certificate(row,draft=false){return`<article class="certificate">${draft?'<div class="draft-stamp">DRAFT � NOT VALID FOR REDEMPTION</div>':''}<div class="cert-brand">COURTYARD</div><div class="cert-property">DALLAS CARROLLTON &amp; CONFERENCE CENTER</div><h3>Gift Certificate</h3><div class="cert-benefit">${esc(row.benefit)}</div><dl><dt>Certificate number</dt><dd><strong>${draft?'Assigned when saved':esc(row.number)}</strong></dd>${row.recipient?`<dt>Recipient</dt><dd>${esc(row.recipient)}</dd>`:''}${row.organization?`<dt>Organization</dt><dd>${esc(row.organization)}</dd>`:''}<dt>Expiration date</dt><dd>${displayDate(row.expires)}</dd><dt>Issued by</dt><dd>${esc(row.issuedBy||'Not recorded')}</dd></dl><div class="cert-terms"><strong>Terms &amp; Conditions</strong>\n${esc(row.terms)}</div><div class="cert-address">1201 Raiford Road, Carrollton, TX 75007 � 972 446 0001</div></article>`;}
+function certificate(row,draft=false){return`<article class="certificate">${draft?'<div class="draft-stamp">DRAFT \u00b7 NOT VALID FOR REDEMPTION</div>':''}<div class="cert-brand">COURTYARD</div><div class="cert-property">DALLAS CARROLLTON &amp; CONFERENCE CENTER</div><h3>Gift Certificate</h3><div class="cert-benefit">${esc(row.benefit)}</div><dl><dt>Certificate number</dt><dd><strong>${draft?'Assigned when saved':esc(row.number)}</strong></dd>${row.recipient?`<dt>Recipient</dt><dd>${esc(row.recipient)}</dd>`:''}${row.organization?`<dt>Organization</dt><dd>${esc(row.organization)}</dd>`:''}<dt>Expiration date</dt><dd>${displayDate(row.expires)}</dd><dt>Issued by</dt><dd>${esc(row.issuedBy||'Not recorded')}</dd></dl><div class="cert-terms"><strong>Terms &amp; Conditions</strong>\n${esc(row.terms)}</div><div class="cert-address">1201 Raiford Road, Carrollton, TX 75007 \u00b7 972 446 0001</div></article>`;}
 $('#preview-draft').onclick=()=>{if(!$('#issue-form').reportValidity())return;$('#draft-preview').innerHTML=certificate(formData($('#issue-form')),true);$('#preview-dialog').showModal();};
 $('#issue-form').onsubmit=async e=>{
  e.preventDefault();if(busy)return;busy=true;e.submitter.disabled=true;
@@ -70,13 +70,13 @@ $('#issue-form').onsubmit=async e=>{
 async function openDetail(id){
  selected=rows.find(r=>r.id===id);if(!selected)return;
  $('#detail-title').textContent='Certificate '+selected.number;
- $('#detail-content').innerHTML=`${badge(selected)}${certificate(selected)}${selected.notes?`<div class="record-notes"><strong>Internal notes</strong>\n${esc(selected.notes)}</div>`:''}${selected.state==='redeemed'?`<p>Redeemed ${selected.redeemedDate?displayDate(selected.redeemedDate):'(date not recorded)'}${selected.redeemedBy?' � '+esc(selected.redeemedBy):''}${selected.confirmation?' � Confirmation '+esc(selected.confirmation):''}</p>`:''}<div class="history" id="history">Loading history.</div>`;
+ $('#detail-content').innerHTML=`${badge(selected)}${certificate(selected)}${selected.notes?`<div class="record-notes"><strong>Internal notes</strong>\n${esc(selected.notes)}</div>`:''}${selected.state==='redeemed'?`<p>Redeemed ${selected.redeemedDate?displayDate(selected.redeemedDate):'(date not recorded)'}${selected.redeemedBy?' \u00b7 '+esc(selected.redeemedBy):''}${selected.confirmation?' \u00b7 Confirmation '+esc(selected.confirmation):''}</p>`:''}<div class="history" id="history">Loading history\u2026</div>`;
  $('#print').disabled=selected.state!=='issued'||!selected.expires;
  $('#redeem-open').hidden=selected.state!=='issued';$('#void-open').hidden=selected.state!=='issued';$('#redeem-form').hidden=true;$('#void-form').hidden=true;
  $('#redeem-error').textContent='';$('#void-error').textContent='';
  if(!$('#detail').open)$('#detail').showModal();
  const detailId=selected.id;
- try{const events=await api(`certificates/${id}/history`);if(selected?.id!==detailId)return;$('#history').innerHTML='<strong>Record history</strong>'+events.map(e=>`<p>${esc(new Date(e.at).toLocaleString())} � ${esc(e.action.replaceAll('_',' '))}${e.action==='voided'?': '+esc(JSON.parse(e.details).reason):''}</p>`).join('');}catch{$('#history').textContent='History could not be loaded. Refresh to try again.';}
+ try{const events=await api(`certificates/${id}/history`);if(selected?.id!==detailId)return;$('#history').innerHTML='<strong>Record history</strong>'+events.map(e=>`<p>${esc(new Date(e.at).toLocaleString())} \u00b7 ${esc(e.action.replaceAll('_',' '))}${e.action==='voided'?': '+esc(JSON.parse(e.details).reason):''}</p>`).join('');}catch{$('#history').textContent='History could not be loaded. Refresh to try again.';}
 }
 $('#print').onclick=()=>{
  if(!selected || selected.state!=='issued'||!selected.expires)return;
@@ -108,7 +108,7 @@ $('#import-file').onchange=async e=>{
  try{const file=e.target.files[0];if(!file)return;workbook=await readWorkbook(file);if(!workbook.length)throw Error('No worksheets found.');$('#import-sheet').innerHTML=workbook.map((s,i)=>`<option value="${i}">${esc(s.name)}</option>`).join('');$('#sheet-choice').hidden=workbook.length<2;chooseSheet();}catch(error){$('#import-error').textContent=error.message;}
 };
 function chooseSheet(){
- const sheet=workbook[+$('#import-sheet').value];$('#header-row').innerHTML=sheet.rows.slice(0,25).map((r,i)=>`<option value="${i}">Row ${i+1}: ${esc(r.filter(Boolean).slice(0,4).join(' � ').slice(0,120))}</option>`).join('');
+ const sheet=workbook[+$('#import-sheet').value];$('#header-row').innerHTML=sheet.rows.slice(0,25).map((r,i)=>`<option value="${i}">Row ${i+1}: ${esc(r.filter(Boolean).slice(0,4).join(' \u00b7 ').slice(0,120))}</option>`).join('');
  const guess=sheet.rows.slice(0,25).findIndex(r=>r.some(c=>/certificate.*(number|#|no)|^cert.*(number|no)|^number$/i.test(c||'')));$('#header-row').value=String(Math.max(0,guess));mapColumns();
 }
 $('#import-sheet').onchange=chooseSheet;$('#header-row').onchange=mapColumns;
@@ -116,7 +116,7 @@ function mapColumns(){
  const sheet=workbook[+$('#import-sheet').value],header=sheet.rows[+$('#header-row').value]||[];
  const width=Math.min(50,Math.max(header.length,...sheet.rows.slice(0,25).map(r=>r.length)));
  $('#column-map').innerHTML=mapFields.map(([key,label,pattern])=>{
- const guess=header.findIndex(h=>pattern.test(h||''));return`<label>${label}${key==='number'?' *':''}<select data-column="${key}"><option value="">Not in log</option>${Array.from({length:width},(_,i)=>`<option value="${i}"${i===guess?' selected':''}>${String.fromCharCode(65+Math.floor(i/26)-(i<26?0:1))}${i<26?'':String.fromCharCode(65+i%26)} � ${esc(header[i]||'Untitled')}</option>`).join('')}</select></label>`;
+ const guess=header.findIndex(h=>pattern.test(h||''));return`<label>${label}${key==='number'?' *':''}<select data-column="${key}"><option value="">Not in log</option>${Array.from({length:width},(_,i)=>`<option value="${i}"${i===guess?' selected':''}>${String.fromCharCode(65+Math.floor(i/26)-(i<26?0:1))}${i<26?'':String.fromCharCode(65+i%26)} \u00b7 ${esc(header[i]||'Untitled')}</option>`).join('')}</select></label>`;
  }).join('');
  $('#mapping').hidden=false;$$('[data-column]').forEach(s=>s.onchange=previewImport);$('#confirm-complete').checked=false;previewImport();
 }
@@ -125,7 +125,7 @@ function readState(value,redeemedDate){
  if(['redeemed','yes','y','used','1','true'].includes(s))return'redeemed';
  if(['void','voided','cancelled','canceled'].includes(s))return'void';
  if(['','issued','active','available','no','n','0','false','not redeemed','expired','outstanding','unused'].includes(s))return redeemedDate?'redeemed':'issued';
- throw Error(`Unknown status "${value}". Check the status column before importing.`);
+ throw Error(`Unknown status \u201c${value}\u201d. Check the status column before importing.`);
 }
 function previewImport(){
  $('#import-error').textContent='';imported=[];$('#import-confirm').disabled=true;
@@ -137,7 +137,7 @@ function previewImport(){
    const row=source[i];if(!row.some(c=>String(c??'').trim())){skipped++;continue;}
    const raw=String(row[+map.number]??'').trim();
    if(!raw)throw Error(`Worksheet row ${header+i+2} has data but no certificate number. Remove summary rows or choose the correct column.`);
-   const match=raw.match(/^(\d{4})\s*[--]\s*(\d{1,6})$/);if(!match||+match[2]<1)throw Error(`Check certificate number "${raw}" on worksheet row ${header+i+2}.`);
+   const match=raw.match(/^(\d{4})\s*[-\u2013]\s*(\d{1,6})$/);if(!match||+match[2]<1)throw Error(`Check certificate number \u201c${raw}\u201d on worksheet row ${header+i+2}.`);
    const result={number:`${match[1]}-${String(+match[2]).padStart(2,'0')}`,terms:settings.terms};
    if(used.has(result.number))throw Error(`Duplicate certificate number ${result.number}. Check the log before importing.`);used.add(result.number);
    for(const [key]of mapFields)if(key!=='number'&&key!=='state')result[key]=map[key]===''?'':String(row[+map[key]]??'').trim();
