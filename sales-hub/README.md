@@ -2,7 +2,19 @@
 
 Replaces the daily checklist experience with a home for practical sales tools. The first tools are a gift certificate generator/tracker and an event totals calculator. BT contracts are visibly marked as a future tool pending the account list.
 
-## Run
+## Hosted database
+
+The live GitHub Pages frontend connects to the project's `sales-hub-api` Edge Function. Records, counters, password hashes, opaque sessions and audit events live in the nonexposed `sales_hub_private` database schema. The public dispatch function is SECURITY INVOKER and executable only by service_role; anon and authenticated roles cannot call it or access the private schema. The Edge Function checks a random database-backed session on every protected operation. Only login and one-time setup accept unauthenticated requests; login attempts are rate limited. No service-role secret is sent to the browser.
+
+The owner receives a private one-time setup link separately. That token is stored only as a SHA-256 hash in the database, is erased on password setup and is never committed. A password must be at least 16 characters and no more than 72 UTF-8 bytes. Sessions last eight hours, stay in browser sessionStorage and are revoked server-side at sign-out.
+
+Applied migrations are recorded in Supabase's migration history. `hosted/schema.sql` is the immutable baseline; `hosted/dispatch-v2.sql` is the updated dispatch definition after adding the settings corrections JSON column. User-confirmed expiration corrections are private runtime data, applied during import and exposed only to authenticated tracker sessions. Do not overwrite the confirmed dates with conflicting duplicate template copies.
+
+The original XLSX could not be downloaded during authoring. The owner subsequently supplied a screenshot of the 2026 worksheet, allowing six organization-level gift entries to be reconciled to five unique numbered 2026 certificates from the supplied documents. The one row marked redeemed is staged with its source date. Importing these private records is awaiting explicit confirmation of the Supabase destination; no contacts or historical redemption records are committed to this repository. Issuing remains disabled until the verified import completes.
+
+The workbook is an organization-level comp-night log, not a one-row-per-certificate numbered inventory. `legacy_awards` preserves those rows and their redemption state separately. Each row links only certificate numbers actually present in the supplied files. Complimentary-night quantities must never be expanded into invented certificate numbers. The frontend displays the original log and numbered certificates separately and exports either dataset. `hosted/dispatch-v3.sql` adds authenticated legacy-log reads after the private legacy_awards table was created through migration history.
+
+## Local development
 
 Node 24 or newer. No package installation is needed.
 
@@ -27,6 +39,6 @@ Workbook parsing reads cell values only and does not execute formulas, macros or
 
 Food, catering fees and other nonrental charges: 8.25% tax. Room rental: 6%. Service charge defaults to 25% and is taxable at 8.25%. Applying service charge to rental is optional. Calculations round service and tax lines to cents.
 
-## Release status
+## Verification limits
 
-The full saved-record workflow requires this server. Copying public/ to GitHub Pages provides the UI and calculator only: API-dependent actions fail closed with a clear connection message. Do not label the certificate tracker as live until the backend is hosted and the original log is imported. No certificate records or private recipient data are bundled with the public code.
+Local Node tests cover the storage adapter, request handler and hosted Edge handler. Native database tests cover authentication, import rollback, numbering, idempotency, redemption, duplicate-redemption rejection and session revocation. Synthetic database tests run inside rolled-back transactions. Edge deployment was confirmed ACTIVE. Browser QA and a direct runtime HTTP check were unavailable in the authoring session. No certificate records, passwords or private recipient data are bundled with the public code.

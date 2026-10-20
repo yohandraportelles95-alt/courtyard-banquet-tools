@@ -44,13 +44,14 @@ export function createApp({ filename=':memory:', password='', secure=true }={}) 
           for(const [key,expiry] of sessions) if(expiry<Date.now()) sessions.delete(key);
           const token=randomBytes(32).toString('hex'); sessions.set(token,Date.now()+8*60*60*1000);
           res.setHeader('Set-Cookie',`sales_session=${token}; Path=/api; HttpOnly; SameSite=Strict; Max-Age=28800${secure?'; Secure':''}`);
-          return send(res,200,{ok:true});
+          return send(res,200,{ok:true,token});
         }
-        const token=req.headers.cookie?.split(';').map(v=>v.trim()).find(v=>v.startsWith('sales_session='))?.slice(14);
+        const token=req.headers['x-sales-session']||req.headers.cookie?.split(';').map(v=>v.trim()).find(v=>v.startsWith('sales_session='))?.slice(14);
         if(!token || (sessions.get(token)??0)<Date.now()) throw new AppError('Sign in to open your saved tracker.',401);
         if(path==='/api/logout'&&req.method==='POST') {sessions.delete(token);res.setHeader('Set-Cookie','sales_session=; Path=/api; HttpOnly; SameSite=Strict; Max-Age=0');return send(res,200,{ok:true});}
         if(path==='/api/settings'&&req.method==='GET') return send(res,200,store.settings());
         if(path==='/api/certificates'&&req.method==='GET') return send(res,200,store.list());
+        if(path==='/api/legacy'&&req.method==='GET') return send(res,200,[]);
         if(path==='/api/certificates'&&req.method==='POST') return send(res,201,store.issue(await body(req)));
         if(path==='/api/import'&&req.method==='POST') {const input=await body(req);return send(res,200,store.importRows(input.rows,input.confirmComplete));}
         const match=path.match(/^\/api\/certificates\/([a-f0-9-]+)\/(redeem|void|history)$/);
@@ -59,7 +60,7 @@ export function createApp({ filename=':memory:', password='', secure=true }={}) 
         throw new AppError('Page not found.',404);
       }
       if(!['GET','HEAD'].includes(req.method)) throw new AppError('Method not allowed.',405);
-      const files={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/style.css':'style.css','/xlsx.js':'xlsx.js'};
+      const files={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/style.css':'style.css','/xlsx.js':'xlsx.js','/config.js':'config.js'};
       if(!files[path]) throw new AppError('Page not found.',404);
       const file=files[path], bytes=readFileSync(join(root,'public',file));
       res.writeHead(200,{'Content-Type':{'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'}[extname(file)],'Cache-Control':'no-cache'});
