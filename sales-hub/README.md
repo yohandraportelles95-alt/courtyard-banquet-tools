@@ -1,6 +1,14 @@
 # Carrollton Sales Hub
 
-Replaces the daily checklist experience with a home for practical sales tools. The first tools are a gift certificate generator/tracker and an event totals calculator. BT contracts are visibly marked as a future tool pending the account list.
+Replaces the daily checklist experience with a home for practical sales tools: gift certificates, event totals, and negotiated corporate accounts with 2027 contract generation.
+
+## Negotiated accounts
+
+The negotiated-account module uses the same owner password and opaque session as gift certificates. `hosted/lnr.sql` defines separate private accounts, activity and immutable contract-version tables and a service-role-only SECURITY INVOKER dispatcher. The Edge Function routes `/lnr/accounts` and per-account history/save/generate operations to this dispatcher. Revision checks prevent stale windows overwriting newer changes. Sent and signed statuses require dates; generating a PDF never sends an email.
+
+Historical contract values, worksheet values, and budget proposals remain distinct. Multiple rates or contacts from the same year are retained for review. Signed agreements outrank worksheets. Locally negotiated accounts, centrally managed programs, and accounts needing classification have separate filters. Account data and source documents must never be committed to this public repository.
+
+`public/lnr-template.json` contains a fresh two-page PDF background using only the Courtyard logo and confidentiality footer, plus template layout and standard contract text. It contains no prior customer text, hidden links, signatures, contact details or source metadata. `lnr-pdf.js` generates a downloadable PDF with the 2027 rate, legal company name, contact, room types and availability. All contract-year references are 2027 and no blackout clause is included. Saved versions retain their original data so a subsequent edit does not change an earlier PDF. The legacy local SQLite adapter does not implement negotiated accounts; use the configured hosted frontend for that module.
 
 ## Hosted database
 
@@ -42,4 +50,3 @@ Food, catering fees and other nonrental charges: 8.25% tax. Room rental: 6%. Ser
 ## Verification limits
 
 Local Node tests cover the storage adapter, request handler and hosted Edge handler. Native database tests cover authentication, import rollback, numbering, idempotency, redemption, duplicate-redemption rejection and session revocation. Synthetic database tests run inside rolled-back transactions. Edge deployment was confirmed ACTIVE. Browser QA and a direct runtime HTTP check were unavailable in the authoring session. No certificate records, passwords or private recipient data are bundled with the public code.
-
