@@ -25,7 +25,7 @@ export function initProfit({api,sessionKey,onSignout}){
  const form=$('#profit-form');
  function inputs(){return Object.fromEntries([...form.elements].filter(e=>e.name).map(e=>[e.name,e.value]));}
  function renderLabor(){
-  $('#profit-labor').innerHTML=model.roles.map(r=>`<tr><td><strong>${esc(r.category)} / ${esc(r.name)}</strong><small>${esc(r.rule)}${r.contract?' · Contract labor':''}</small></td><td data-suggest="${r.id}"></td>${['count','hours','rate','prior'].map(k=>`<td><input type="number" min="0" max="${k==='count'?100000:k==='rate'?10000:168}" step="${k==='count'?1:.25}" data-role="${r.id}" data-key="${k}" aria-label="${esc(r.category+' '+r.name+' '+k)}" placeholder="${k==='hours'?r.hours:k==='rate'?r.rate:k==='prior'?0:'Auto'}"></td>`).join('')}<td data-ot="${r.id}"></td><td data-mult="${r.id}"></td><td data-cost="${r.id}"></td></tr>`).join('');
+  $('#profit-labor').innerHTML=model.roles.map(r=>`<tr><td><strong>${esc(r.category)} / ${esc(r.name)}</strong><small>${esc(r.rule)}${r.contract?' · Contract labor':''}</small></td><td data-suggest="${r.id}"></td>${['count','hours','rate','prior'].map(k=>`<td><input type="number" min="0" max="${k==='count'?100000:k==='rate'?10000:168}" step="${k==='count'?1:k==='rate'?.01:.25}" data-role="${r.id}" data-key="${k}" aria-label="${esc(r.category+' '+r.name+' '+k)}" placeholder="${k==='hours'?r.hours:k==='rate'?r.rate:k==='prior'?0:'Auto'}"></td>`).join('')}<td data-ot="${r.id}"></td><td data-mult="${r.id}"></td><td data-cost="${r.id}"></td></tr>`).join('');
   $('#profit-labor').querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{(overrides[el.dataset.role]??={})[el.dataset.key]=el.value;update();}));
  }
  function update(){
