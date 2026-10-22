@@ -1,4 +1,4 @@
-import {buildContractPdf,downloadContract} from './lnr-pdf.js?v=lnr1';
+import {buildContractPdf,downloadContract} from './lnr-pdf.js?v=sertifi1';
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>v==null?'\u2014':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(v/100);
