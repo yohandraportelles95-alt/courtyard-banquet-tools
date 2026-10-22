@@ -1,4 +1,4 @@
-// Builds an ordinary downloadable PDF using a sanitized copy of the 2026 agreement.
+// Builds a Sertifi-ready downloadable PDF using a sanitized copy of the 2026 agreement.
 // Customer details exist only in the authenticated response and the downloaded document.
 const replacements={'\u2018':"'",'\u2019':"'",'\u201c':'"','\u201d':'"','\u2013':'-','\u2014':'-','\u00a0':' '};
 function clean(value){return String(value??'').replace(/[\u2018\u2019\u201c\u201d\u2013\u2014\u00a0]/g,c=>replacements[c]);}
@@ -12,7 +12,7 @@ export function buildContractPdf(data,model){
  const values={...data,company:data.contractCompany||data.company,availabilityText:data.availability==='LRA'?'LAST ROOM AVAILABILITY':'NON-LAST ROOM AVAILABILITY',fax:'',acceptByDisplay:data.acceptBy?.split('-').slice(1).concat(data.acceptBy.split('-')[0]).join('/')};
  if(!data.acceptBy||!/^\d{4}-\d{2}-\d{2}$/.test(data.acceptBy))throw Error('Choose the contract return date.');
  const streams=model.pages.map(()=>[]);
- for(const f of model.fields){const value=f.text.replace(/\{\{(\w+)\}\}/g,(_,k)=>values[k]??'');streams[f.page].push(textOps(f,value,model));}
+ for(const f of model.fields){const signatureLabel=f.page===1&&[553,640].includes(f.y)&&f.x===310?'Signature:':f.page===1&&[579,666].includes(f.y)&&f.x===310?'Date:':f.page===1&&f.y===579&&f.x===54?'Title:':f.text;const value=signatureLabel.replace(/\{\{(\w+)\}\}/g,(_,k)=>values[k]??'');streams[f.page].push(textOps(f,value,model));}
  function table(y,rate,room,additional=''){
   const x=142,cw=66,width=cw*4,header=28,row=21,height=header+row+(additional?22:0),ops=['q 0.6 G 0.45 w'];
   for(const yy of [y,y+header,y+header+row,...(additional?[y+height]:[])])ops.push(`${x} ${792-yy} m ${x+width} ${792-yy} l S`);
@@ -25,7 +25,32 @@ export function buildContractPdf(data,model){
  streams[0].push(table(338,'$189','GENR'),table(441,'$'+(data.rate2027/100).toFixed(2),data.roomType||'GENR/QNQN',data.additionalRate||''));
  const raw=atob(model.base64);let result=raw+'\n',next=model.size;const entries=[];
  function obj(id,body){entries.push([id,result.length]);result+=`${id} 0 obj\n${body}\nendobj\n`;}
- model.pages.forEach((p,i)=>{const id=next++,content=streams[i].join('\n');obj(id,`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);let dict=p.dictionary;if(/\/Contents\s*\[/.test(dict))dict=dict.replace(/\/Contents\s*\[([^\]]*)\]/,(_,a)=>`/Contents [${a} ${id} 0 R]`);else dict=dict.replace(/\/Contents\s*(\d+\s+0\s+R)/,`/Contents [$1 ${id} 0 R]`);obj(p.id,dict);});
+ // Named AcroForm text widgets are recognized by Sertifi on upload.
+ // Keep signer levels aligned with the tested client (1) / hotel (2) setup.
+ const fontId=next++;obj(fontId,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+ const signingPage=model.pages[1];
+ if(!signingPage)throw Error('The contract signature page is missing.');
+ const signingFields=[
+  {name:'SertifiSignature_1',x:356,y:220,w:198,h:26,value:''},
+  {name:'SertifiTitle_1',x:80,y:193,w:209,h:20,value:data.contactTitle||''},
+  {name:'SertifiDate_1',x:340,y:193,w:214,h:20,value:''},
+  {name:'SertifiSignature_2',x:356,y:133,w:198,h:26,value:''},
+  {name:'SertifiDate_2',x:340,y:106,w:214,h:20,value:''}
+ ];
+ const fieldIds=signingFields.map(f=>{
+  const appearance=next++,id=next++;
+  const value=clean(f.value);
+  const fontSize=Math.min(9,Math.max(5,f.w/(Math.max(1,value.length)*.6)));
+  const content=`q 0.96 g 0 0 ${f.w} ${f.h} re f 0.7 G 0.5 w .25 .25 ${f.w-.5} ${f.h-.5} re S Q\nBT /Helv ${fontSize} Tf 0 g 3 6 Td ${literal(value)} Tj ET`;
+  obj(appearance,`<< /Type /XObject /Subtype /Form /BBox [0 0 ${f.w} ${f.h}] /Resources << /Font << /Helv ${fontId} 0 R >> >> /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  obj(id,`<< /Type /Annot /Subtype /Widget /FT /Tx /T ${literal(f.name)} /TU ${literal(f.name)} /V ${literal(value)} /Rect [${f.x} ${f.y} ${f.x+f.w} ${f.y+f.h}] /P ${signingPage.id} 0 R /F 4 /DA (/Helv 9 Tf 0 g) /AP << /N ${appearance} 0 R >> >>`);
+  return id;
+ });
+ const formId=next++;obj(formId,`<< /Fields [${fieldIds.map(id=>id+' 0 R').join(' ')}] /DR << /Font << /Helv ${fontId} 0 R >> >> /DA (/Helv 9 Tf 0 g) /NeedAppearances false >>`);
+ const catalog=raw.match(new RegExp('(?:^|\\n)'+model.root+' 0 obj\\s*([\\s\\S]*?)\\s*endobj'));
+ if(!catalog)throw Error('The PDF catalog could not be read.');
+ obj(model.root,catalog[1].replace(/>>\s*$/,` /AcroForm ${formId} 0 R >>`));
+ model.pages.forEach((p,i)=>{const id=next++,content=streams[i].join('\n');obj(id,`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);let dict=p.dictionary;if(i===1)dict=dict.replace(/>>\s*$/,` /Annots [${fieldIds.map(id=>id+' 0 R').join(' ')}] >>`);if(/\/Contents\s*\[/.test(dict))dict=dict.replace(/\/Contents\s*\[([^\]]*)\]/,(_,a)=>`/Contents [${a} ${id} 0 R]`);else dict=dict.replace(/\/Contents\s*(\d+\s+0\s+R)/,`/Contents [$1 ${id} 0 R]`);obj(p.id,dict);});
  const start=result.length;result+='xref\n';for(const [id,offset] of entries.sort((a,b)=>a[0]-b[0]))result+=`${id} 1\n${String(offset).padStart(10,'0')} 00000 n \n`;
  result+=`trailer\n<< /Size ${next} /Root ${model.root} 0 R /Prev ${model.previousXref} >>\nstartxref\n${start}\n%%EOF\n`;return bytes(result);
 }
