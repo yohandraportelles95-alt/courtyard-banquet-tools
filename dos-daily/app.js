@@ -1,3 +1,4 @@
+import {initProfit} from './profit.js?v=profit1';
 import {initLnr} from './lnr.js?v=lnr2';
 import {readWorkbook,dateCell} from './xlsx.js?v=icons2';
 import {API_URL} from './config.js';
@@ -21,6 +22,7 @@ async function api(path,method='GET',body){
  if(!type.includes('application/json'))throw Error('The saved tracker is not connected yet. You can explore the page, but records cannot be issued or changed.');
  const data=await response.json();if(!response.ok){if(response.status===401&&path!=='login')sessionStorage.removeItem(sessionKey);const error=Error(data.error||'Could not complete the request.');error.status=response.status;throw error;}return data;
 }
+const profit=initProfit({api,sessionKey,onSignout:()=>$('#signout').click()});
 const lnr=initLnr({api,toast,sessionKey,onSignout:()=>$('#signout').click()});
 async function refresh(){
  try{
@@ -35,11 +37,11 @@ async function refresh(){
   $('#login').hidden=error.status!==401||!!setupToken;$('#setup-form').hidden=error.status!==401||!setupToken;$('#signout').hidden=true;$('#new-certificate').disabled=true;$('#export').disabled=true;$('#import-open').disabled=true;$('#refresh').disabled=true;
  }
 }
-function route(){const name=location.hash.slice(1)||'home';const target=['home','certificates','calculator','lnr'].includes(name)?name:'home';$$('.view').forEach(el=>el.hidden=el.id!==target);$$('[data-nav]').forEach(el=>{el.classList.toggle('active',el.dataset.nav===target);if(el.dataset.nav===target)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});if(target==='certificates')refresh();if(target==='lnr')lnr.refresh();}
+function route(){const name=location.hash.slice(1)||'home';const target=['home','certificates','calculator','lnr'].includes(name)?name:'home';$$('.view').forEach(el=>el.hidden=el.id!==target);$$('[data-nav]').forEach(el=>{el.classList.toggle('active',el.dataset.nav===target);if(el.dataset.nav===target)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});if(target==='certificates')refresh();if(target==='lnr')lnr.refresh();if(target==='calculator')profit.refresh();}
 addEventListener('hashchange',route);route();
 $('#login').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{const result=await api('login','POST',{password:new FormData(e.target).get('password')});sessionStorage.setItem(sessionKey,result.token);e.target.reset();await refresh();}catch(error){$('#connection').textContent=error.message;}finally{button.disabled=false;}};
 $('#setup-form').onsubmit=async e=>{e.preventDefault();const form=e.target,button=e.submitter;button.disabled=true;try{const password=form.elements.password.value;if(password!==form.elements.confirmPassword.value)throw Error('The passwords do not match.');const result=await api('setup','POST',{setupToken,password});sessionStorage.setItem(sessionKey,result.token);sessionStorage.removeItem('carrollton-sales-setup');setupToken='';form.reset();await refresh();toast('Your private tracker is ready to import the log.');}catch(error){$('#connection').textContent=error.message;}finally{button.disabled=false;}};
-$('#signout').onclick=async()=>{try{await api('logout','POST',{});}finally{sessionStorage.removeItem(sessionKey);lnr.clear();rows=[];legacyRows=[];selected=null;settings=null;$$('dialog[open]').forEach(d=>d.close());$('#print-area').innerHTML='';render();renderLegacy();await refresh();}};
+$('#signout').onclick=async()=>{try{await api('logout','POST',{});}finally{sessionStorage.removeItem(sessionKey);lnr.clear();profit.clear();rows=[];legacyRows=[];selected=null;settings=null;$$('dialog[open]').forEach(d=>d.close());$('#print-area').innerHTML='';render();renderLegacy();await refresh();}};
 $('#refresh').onclick=refresh;
 function render(){
  const counts={available:0,redeemed:0,expired:0};for(const row of rows)if(status(row) in counts)counts[status(row)]++;
@@ -160,10 +162,3 @@ $('#import-confirm').onclick=async()=>{
  if(busy||!imported.length||!$('#confirm-complete').checked)return;busy=true;$('#import-confirm').disabled=true;
  try{const result=await api('import','POST',{rows:imported,confirmComplete:true});$('#import-dialog').close();await refresh();toast(`${result.added} certificates imported. ${result.skipped} unchanged records skipped.`);}catch(error){$('#import-error').textContent=error.message;}finally{busy=false;$('#import-confirm').disabled=false;}
 };
-function calc(){
- const form=$('#calc');if(!form.checkValidity())return;
- const f=formData(form), cents=v=>Math.round(Number(v)*100), guests=Number(f.guests);
- const subtotal=guests*cents(f.pp)+cents(f.other),rental=cents(f.rental),service=Math.round((subtotal+(f.rentalService?rental:0))*Number(f.service)/100),tax=Math.round((subtotal+service)*.0825),rentalTax=Math.round(rental*.06),total=subtotal+rental+service+tax+rentalTax;
- $('#calc-total').textContent=money(total);$('#calc-lines').innerHTML=[['Food / catering / other',subtotal],['Room rental',rental],[`Service charge (${f.service}%)`,service],['Food / fees / service tax (8.25%)',tax],['Rental tax (6%)',rentalTax]].map(([label,value])=>`<dt>${esc(label)}</dt><dd>${money(value)}</dd>`).join('');
-}
-$('#calc').oninput=calc;$('#calc').onsubmit=e=>e.preventDefault();calc();

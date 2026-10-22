@@ -19,7 +19,7 @@ export async function handle(req: Request) {
    const text=await req.text();if(text.length>5_000_000)return reply({error:'Import is too large.'},413);
    body=JSON.parse(text);if(!body||typeof body!=='object'||Array.isArray(body))return reply({error:'Invalid request.'},400);
   }
-  let action='';let lnr=false;
+  let action='';let lnr=false;let profit=false;
   if(req.method==='GET')action=({'/settings':'settings','/certificates':'list','/legacy':'legacy_list'} as Record<string,string>)[path]||'';
   else action=({'/setup':'setup','/login':'login','/logout':'logout','/import':'import','/certificates':'issue'} as Record<string,string>)[path]||'';
   const match=path.match(/^\/certificates\/([a-f0-9-]{36})\/(redeem|void|history)$/);
@@ -27,11 +27,12 @@ export async function handle(req: Request) {
   if(path==='/lnr/accounts'&&['GET','POST'].includes(req.method)){lnr=true;action=req.method==='GET'?'list':'create';}
   const accountMatch=path.match(/^\/lnr\/accounts\/([a-f0-9-]{36})\/(history|save|generate)$/);
   if(accountMatch&&((accountMatch[2]==='history'&&req.method==='GET')||(accountMatch[2]!=='history'&&req.method==='POST'))){lnr=true;action=accountMatch[2];body={...body,id:accountMatch[1]};}
+  if(path==='/profit/config'&&req.method==='GET'){profit=true;action='config';}
   if(path==='/health'&&req.method==='GET')action='settings';
   if(!action)return reply({error:'Page not found.'},404);
   const key=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');const url=Deno.env.get('SUPABASE_URL');
   if(!key||!url)return reply({error:'Database connection is unavailable.'},503);
-  const response=await fetch(url+'/rest/v1/rpc/'+(lnr?'sales_hub_lnr':'sales_hub_dispatch'),{method:'POST',headers:{'Content-Type':'application/json','apikey':key,'Authorization':'Bearer '+key},body:JSON.stringify({p_action:action,p_body:body,p_token:req.headers.get('x-sales-session')||''})});
+  const response=await fetch(url+'/rest/v1/rpc/'+(profit?'sales_hub_profit':lnr?'sales_hub_lnr':'sales_hub_dispatch'),{method:'POST',headers:{'Content-Type':'application/json','apikey':key,'Authorization':'Bearer '+key},body:JSON.stringify({p_action:action,p_body:body,p_token:req.headers.get('x-sales-session')||''})});
   if(!response.ok)return reply({error:'The saved tracker could not complete the request.'},503);
   const result=await response.json();
   if(path==='/health')return reply({ok:result?._status===401,database:result?._status===401?'connected':'unavailable'},result?._status===401?200:503);
