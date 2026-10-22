@@ -11,8 +11,15 @@ export function buildContractPdf(data,model){
  if(!Number.isInteger(data.rate2027)||data.rate2027<100)throw Error('Enter the 2027 rate first.');
  const values={...data,company:data.contractCompany||data.company,availabilityText:data.availability==='LRA'?'LAST ROOM AVAILABILITY':'NON-LAST ROOM AVAILABILITY',fax:'',acceptByDisplay:data.acceptBy?.split('-').slice(1).concat(data.acceptBy.split('-')[0]).join('/')};
  if(!data.acceptBy||!/^\d{4}-\d{2}-\d{2}$/.test(data.acceptBy))throw Error('Choose the contract return date.');
+ const breakfast=data.breakfast||(/breakfast included/i.test(data.additionalRate||'')?'included':'not_included');
+ const billing=data.billing||'individual';
+ if(!['included','not_included'].includes(breakfast)||!['individual','company_room_tax','company_all'].includes(billing))throw Error('Choose valid breakfast and billing options.');
+ const billingText=billing==='company_all'?'All charges for company-designated guests, including room, applicable taxes and incidentals, will be charged to the company credit card on file, subject to a completed credit card authorization covering those charges before arrival.':billing==='company_room_tax'?'Room and applicable taxes for company-designated guests will be charged to the company credit card on file, subject to a completed credit card authorization before arrival. Each traveler is responsible for incidentals and must provide payment at check-in.':null;
  const streams=model.pages.map(()=>[]);
- for(const f of model.fields){const signatureLabel=f.page===1&&[553,640].includes(f.y)&&f.x===310?'Signature:':f.page===1&&[579,666].includes(f.y)&&f.x===310?'Date:':f.page===1&&f.y===579&&f.x===54?'Title:':f.text;const value=signatureLabel.replace(/\{\{(\w+)\}\}/g,(_,k)=>values[k]??'');streams[f.page].push(textOps(f,value,model));}
+ for(const f of model.fields){const signatureLabel=f.page===1&&[553,640].includes(f.y)&&f.x===310?'Signature:':f.page===1&&[579,666].includes(f.y)&&f.x===310?'Date:':f.page===1&&f.y===579&&f.x===54?'Title:':f.text;let content=signatureLabel;
+ if(f.page===1&&f.y===202&&billingText)content=billingText;
+ if(f.page===0&&f.y===516)content=(breakfast==='included'?'Breakfast is included in the negotiated room rate. ':'Breakfast is not included in the negotiated room rate. ')+content;
+ const value=content.replace(/\{\{(\w+)\}\}/g,(_,k)=>values[k]??'');streams[f.page].push(textOps(f,value,model));}
  function table(y,rate,room,additional=''){
   const x=142,cw=66,width=cw*4,header=28,row=21,height=header+row+(additional?22:0),ops=['q 0.6 G 0.45 w'];
   for(const yy of [y,y+header,y+header+row,...(additional?[y+height]:[])])ops.push(`${x} ${792-yy} m ${x+width} ${792-yy} l S`);
@@ -22,7 +29,7 @@ export function buildContractPdf(data,model){
   ['01/01/27','12/31/27',room,rate].forEach((s,i)=>ops.push(textOps({x:x+i*cw+3,y:y+header+4,w:cw-6,h:15,size:10,font:'tiro'},s,model)));
   if(additional)ops.push('q 1 g '+`${x+.5} ${792-y-height+.5} ${width-1} 21 re f Q`,textOps({x:x+4,y:y+header+row+3,w:width-8,h:17,size:9.5,font:'tiro'},additional,model));return ops.join('\n');
  }
- streams[0].push(table(338,'$189','GENR'),table(441,'$'+(data.rate2027/100).toFixed(2),data.roomType||'GENR/QNQN',data.additionalRate||''));
+ streams[0].push(table(338,'$189','GENR'),table(441,'$'+(data.rate2027/100).toFixed(2),data.roomType||'GENR/QNQN',(data.additionalRate||'').replace(/Breakfast included in the rate\.?/gi,'').trim()));
  const raw=atob(model.base64);let result=raw+'\n',next=model.size;const entries=[];
  function obj(id,body){entries.push([id,result.length]);result+=`${id} 0 obj\n${body}\nendobj\n`;}
  // Named AcroForm text widgets are recognized by Sertifi on upload.
