@@ -1,4 +1,4 @@
-import {buildContractPdf,downloadContract} from './lnr-pdf.js?v=sertifi1';
+import {buildContractPdf,downloadContract} from './lnr-pdf.js?v=terms1';
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>v==null?'\u2014':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(v/100);
@@ -27,6 +27,7 @@ export function initLnr({api,toast,sessionKey,onSignout}){
  async function open(id){
   selected=accounts.find(a=>a.id===id);if(!selected)return;history=null;form.reset();$('#lnr-detail-title').textContent=selected.company;
   for(const el of form.elements){if(!el.name)continue;let value=selected[el.name]??'';if(['rate2027','proposed2027'].includes(el.name))value=value===''?'':(value/100).toFixed(2);el.value=value;}
+  form.elements.breakfast.value=selected.breakfast||(/breakfast included/i.test(selected.additionalRate||'')?'included':'not_included');form.elements.billing.value=selected.billing||'individual';
   form.elements.contractCompany.value=selected.contractCompany||selected.company;form.elements.availability.value=selected.availability||'NLRA';form.elements.roomType.value=selected.roomType||'GENR/QNQN';form.elements.acceptBy.value=selected.acceptBy||'2027-01-06';form.elements.status.value=selected.status||'not_started';
   $('#lnr-review').textContent=(selected.reviewNotes||[]).join(' ');$('#lnr-review').hidden=!selected.reviewNotes?.length;
   $('#lnr-contact-source').textContent=selected.contactSource?'Contact source: '+selected.contactSource:'Contact from the account spreadsheet.';
@@ -53,6 +54,6 @@ export function initLnr({api,toast,sessionKey,onSignout}){
  form.onsubmit=e=>{e.preventDefault();save(false);};$('#lnr-generate').onclick=()=>save(true);form.elements.status.onchange=updateStateFields;form.elements.management.onchange=updateStateFields;
  $('#lnr-new').onclick=()=>{$('#lnr-new-form').reset();$('#lnr-new-error').textContent='';$('#lnr-new-dialog').showModal();};
  $('#lnr-new-form').onsubmit=async e=>{e.preventDefault();e.submitter.disabled=true;try{const a=await api('lnr/accounts','POST',{company:new FormData(e.target).get('company')});accounts.push(a);render();$('#lnr-new-dialog').close();await open(a.id);}catch(e){$('#lnr-new-error').textContent=e.message;}finally{e.submitter.disabled=false;}};
- $('#lnr-export').onclick=()=>{const keys=['company','management','availability','contactName','contactEmail','contactPhone','rate2025','rate2026','proposed2027','rate2027','status','sentDate','signedDate','notes'];const cell=v=>'"'+String(v??'').replace(/^[=+@\-\t\r]/,"'$&").replaceAll('"','""')+'"';const rows=[keys,...accounts.map(a=>keys.map(k=>['rate2025','rate2026','proposed2027','rate2027'].includes(k)?a[k]==null?'':(a[k]/100).toFixed(2):a[k]))];const url=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(cell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='2027-negotiated-accounts.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
+ $('#lnr-export').onclick=()=>{const keys=['company','management','availability','contactName','contactEmail','contactPhone','breakfast','billing','rate2025','rate2026','proposed2027','rate2027','status','sentDate','signedDate','notes'];const cell=v=>'"'+String(v??'').replace(/^[=+@\-\t\r]/,"'$&").replaceAll('"','""')+'"';const rows=[keys,...accounts.map(a=>keys.map(k=>['rate2025','rate2026','proposed2027','rate2027'].includes(k)?a[k]==null?'':(a[k]/100).toFixed(2):a[k]))];const url=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(cell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='2027-negotiated-accounts.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
  return {refresh,clear};
 }
