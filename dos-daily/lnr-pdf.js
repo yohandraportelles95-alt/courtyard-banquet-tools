@@ -16,7 +16,7 @@ export function buildContractPdf(data,model){
  if(!['included','not_included'].includes(breakfast)||!['individual','company_room_tax','company_all'].includes(billing))throw Error('Choose valid breakfast and billing options.');
  const billingText=billing==='company_all'?'All charges for company-designated guests, including room, applicable taxes and incidentals, will be charged to the company credit card on file, subject to a completed credit card authorization covering those charges before arrival.':billing==='company_room_tax'?'Room and applicable taxes for company-designated guests will be charged to the company credit card on file, subject to a completed credit card authorization before arrival. Each traveler is responsible for incidentals and must provide payment at check-in.':null;
  const streams=model.pages.map(()=>[]);
- for(const f of model.fields){const signatureLabel=f.page===1&&[553,640].includes(f.y)&&f.x===310?'Signature:':f.page===1&&[579,666].includes(f.y)&&f.x===310?'Date:':f.page===1&&f.y===579&&f.x===54?'Title:':f.text;let content=signatureLabel;
+ for(const f of model.fields){const signatureLabel=f.page===1&&[553,640].includes(f.y)&&f.x===310?'Signature:':f.page===1&&[579,666].includes(f.y)&&f.x===310?'Date:':f.page===1&&f.y===579&&f.x===54?'Title: {{contactTitle}}':f.text;let content=signatureLabel;
  if(f.page===1&&f.y===202&&billingText)content=billingText;
  if(f.page===0&&f.y===516)content=(breakfast==='included'?'Breakfast is included in the negotiated room rate. ':'Breakfast is not included in the negotiated room rate. ')+content;
  const value=content.replace(/\{\{(\w+)\}\}/g,(_,k)=>values[k]??'');streams[f.page].push(textOps(f,value,model));}
@@ -39,7 +39,7 @@ export function buildContractPdf(data,model){
  if(!signingPage)throw Error('The contract signature page is missing.');
  const signingFields=[
   {name:'SertifiSignature_1',x:356,y:220,w:198,h:26,value:''},
-  {name:'SertifiTitle_1',x:80,y:193,w:209,h:20,value:data.contactTitle||''},
+  {name:'SertifiTitle_1',x:80,y:193,w:209,h:20,value:''},
   {name:'SertifiDate_1',x:340,y:193,w:214,h:20,value:''},
   {name:'SertifiSignature_2',x:356,y:133,w:198,h:26,value:''},
   {name:'SertifiDate_2',x:340,y:106,w:214,h:20,value:''}
@@ -48,7 +48,7 @@ export function buildContractPdf(data,model){
   const appearance=next++,id=next++;
   const value=clean(f.value);
   const fontSize=Math.min(9,Math.max(5,f.w/(Math.max(1,value.length)*.6)));
-  const content=`q 0.96 g 0 0 ${f.w} ${f.h} re f 0.7 G 0.5 w .25 .25 ${f.w-.5} ${f.h-.5} re S Q\nBT /Helv ${fontSize} Tf 0 g 3 6 Td ${literal(value)} Tj ET`;
+  const content=`q Q`;
   obj(appearance,`<< /Type /XObject /Subtype /Form /BBox [0 0 ${f.w} ${f.h}] /Resources << /Font << /Helv ${fontId} 0 R >> >> /Length ${content.length} >>\nstream\n${content}\nendstream`);
   obj(id,`<< /Type /Annot /Subtype /Widget /FT /Tx /T ${literal(f.name)} /TU ${literal(f.name)} /V ${literal(value)} /Rect [${f.x} ${f.y} ${f.x+f.w} ${f.y+f.h}] /P ${signingPage.id} 0 R /F 4 /DA (/Helv 9 Tf 0 g) /AP << /N ${appearance} 0 R >> >>`);
   return id;
