@@ -1,4 +1,4 @@
-import {downloadAccountSheet} from './lnr-account-sheet.js?v=sheet1';
+import {downloadAccountSheet} from './lnr-account-sheet.js?v=sheet2';
 import {buildContractPdf,downloadContract} from './lnr-pdf.js?v=transparent1';
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
