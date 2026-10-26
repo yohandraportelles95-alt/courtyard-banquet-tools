@@ -7,7 +7,7 @@ export function buildAccountSheet(data){
  const pages=[];let ops=[],y=744;
  function text(s,x=48,size=10,bold=false){ops.push('BT /'+(bold?'B':'F')+' '+size+' Tf 1 0 0 1 '+x+' '+y+' Tm '+lit(s)+' Tj ET');}
  function footer(){ops.push('BT /F 8 Tf 1 0 0 1 48 28 Tm (INTERNAL ACCOUNT FILE - Courtyard Dallas Carrollton & Conference Center) Tj ET');pages.push(ops.join('\n'));ops=[];y=744;}
- function space(n){if(y-n<55)footer();}
+ function space(n){}
  function line(s,size=10,bold=false){
   // Helvetica's widest printable character is narrower than 1 em.
   const max=Math.floor(510/(size*.61)),words=clean(s).split(/\s+/);let row='';
@@ -16,22 +16,23 @@ export function buildAccountSheet(data){
   space(15);text(row,48,size,bold);y-=15;
  }
  function section(s){space(45);y-=10;line(s,11,true);ops.push('0.6 G 48 '+(y+7)+' m 564 '+(y+7)+' l S 0 G');y-=5;}
- function field(label,value){line(label+': '+(value||'Not recorded'));}
+ function field(label,value){const v=clean(value||'Not recorded');line(label+': '+(v.length>150?v.slice(0,130)+'... (see tool)':v));}
  line('NEGOTIATED ACCOUNT RECORD',16,true);
  line(data.contractCompany||data.company||'Account',13,true);
- line('Multi-year account file | Keep this sheet and update it by hand each year',9);
+ line('Account reference | Annual updates',9);
  section('COMPANY & CURRENT CONTACT');
  if(data.contractCompany&&data.contractCompany!==data.company)field('Account name',data.company);
  field('Contact',data.contactName);if(data.contactTitle)field('Title',data.contactTitle);
  field('Phone',data.contactPhone);field('Email',data.contactEmail);
  field('Address',[data.street,data.cityState,data.country].filter(Boolean).join(', '));
- field('Rate code',data.rateCode);field('Cluster code',data.clusterCode==='?'?'Needs confirmation':data.clusterCode);
+ line('Rate code: '+(data.rateCode||'Not recorded')+'     |     Cluster code: '+(data.clusterCode==='?'?'Needs confirmation':data.clusterCode||'Not recorded'));
  field('Account type',({local:'Locally negotiated',central:'Global / GPP / MarRFP',review:'Confirm account type'})[data.management]);
  section('ANNUAL RATE & RENEWAL LOG');
- const years=[...new Set([2025,2026,2027,2028,2029,2030,2031,2032,...(data.history||[]).map(h=>Number(h.year)).filter(n=>Number.isInteger(n)&&n>=2000&&n<=2032)])].sort((a,b)=>a-b);
+ const earlier=[...new Set((data.history||[]).map(h=>Number(h.year)).filter(n=>Number.isInteger(n)&&n>=2000&&n<2025))].sort((a,b)=>b-a).slice(0,2);
+ const years=[...earlier,2025,2026,2027,2028,2029,2030,2031,2032].sort((a,b)=>a-b);
  const widths=[40,64,77,43,43,43,206],xs=[48];for(const w of widths)xs.push(xs.at(-1)+w);
  function tableRow(values,header=false){
-  const h=header?30:25;space(h+5);const top=y+9,bottom=top-h;
+  const h=header?24:18;space(h+5);const top=y+9,bottom=top-h;
   if(header)ops.push('0.94 g 48 '+bottom+' 516 '+h+' re f 0 g');
   ops.push('0.6 G 0.45 w');for(const x of xs)ops.push(x+' '+bottom+' m '+x+' '+top+' l S');
   for(const yy of [bottom,top])ops.push('48 '+yy+' m 564 '+yy+' l S');ops.push('0 G');
@@ -51,12 +52,11 @@ export function buildAccountSheet(data){
   const rateTexts=[...new Set(records.map(h=>h.rateText).filter(Boolean))];if(rateTexts.length)note+=(note?'; ':'')+rateTexts.join('; ');
   // Details continue below when too long for handwriting space.
   if(note.length>35)note=note.slice(0,32)+'...';
-  if(y<95){footer();line('ANNUAL RATE & RENEWAL LOG - CONTINUED',11,true);tableRow(headings,true);}
+  
   tableRow([String(year),amount==null?'':money(amount),year===2027?data.signedDate||'':'','','','',note]);
  }
- tableRow(['','','','','','','']);tableRow(['','','','','','','']);
- line('Blank cells are for annual updates. Verify both signatures, rate loading, CC authorization',8);
- line('and booking link delivery before marking the corresponding column. Use N/A when applicable.',8);
+ tableRow(['','','','','','','']);
+ line('Mark annual steps after verification. N/A = not applicable. Full account history is in the tool.',8);
  section('BILLING & RESERVATIONS');
  field('Billing',({individual:'Individual traveler pays',company_room_tax:'Company credit card - Room & Tax',company_all:'Company credit card - All charges'})[data.billing||'individual']);
  field('Breakfast',((data.breakfast||(/breakfast included/i.test(data.additionalRate||'')?'included':'not_included'))==='included')?'Included in room rate':'Not included');
@@ -64,7 +64,9 @@ export function buildAccountSheet(data){
  line('Reservations:  Booking link ______   Email direct ______   Other ______');
  section('CONTACT / TERMS CHANGES');
  for(let i=0;i<2;i++){space(22);ops.push('0.7 G 48 '+(y-8)+' m 564 '+(y-8)+' l S 0 G');y-=22;}
- if(data.notes){section('INTERNAL NOTES');for(const s of clean(data.notes).split('\n'))line(s,9);}
+ if(data.notes){section('INTERNAL NOTES');const note=clean(data.notes).replace(/\s+/g,' ');line(note.length>230?note.slice(0,210)+'... (more in tool)':note,9);}
+ // Fit unusually long contact records on one page without adding a second sheet.
+ if(y<58){const scale=686/(744-y);ops=['q 1 0 0 '+scale.toFixed(5)+' 0 '+(744*(1-scale)).toFixed(3)+' cm',...ops,'Q'];}
  footer();
  const objects=['','<< /Type /Catalog /Pages 2 0 R >>','', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'];
  const kids=[];for(const content of pages){const id=objects.length;objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F 3 0 R /B 4 0 R >> >> /Contents '+(id+1)+' 0 R >>');objects.push('<< /Length '+content.length+' >>\nstream\n'+content+'\nendstream');kids.push(id+' 0 R');}
