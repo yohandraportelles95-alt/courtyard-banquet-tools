@@ -17,9 +17,9 @@ export function buildAccountSheet(data){
  }
  function section(s){space(45);y-=10;line(s,11,true);ops.push('0.6 G 48 '+(y+7)+' m 564 '+(y+7)+' l S 0 G');y-=5;}
  function field(label,value){line(label+': '+(value||'Not recorded'));}
- line('LOCAL NEGOTIATED RATE CHECKLIST',16,true);
+ line('NEGOTIATED ACCOUNT RECORD',16,true);
  line(data.contractCompany||data.company||'Account',13,true);
- line('Account file cover sheet | 2027 renewal',9);
+ line('Multi-year account file | Keep this sheet and update it by hand each year',9);
  section('COMPANY & CURRENT CONTACT');
  if(data.contractCompany&&data.contractCompany!==data.company)field('Account name',data.company);
  field('Contact',data.contactName);if(data.contactTitle)field('Title',data.contactTitle);
@@ -27,31 +27,44 @@ export function buildAccountSheet(data){
  field('Address',[data.street,data.cityState,data.country].filter(Boolean).join(', '));
  field('Rate code',data.rateCode);field('Cluster code',data.clusterCode==='?'?'Needs confirmation':data.clusterCode);
  field('Account type',({local:'Locally negotiated',central:'Global / GPP / MarRFP',review:'Confirm account type'})[data.management]);
- section('RATES & RENEWAL');
- field('2027 status',statusLabels[data.status]||'Not started');
- if(data.sentDate)field('Sent date',data.sentDate);if(data.signedDate)field('Signed date recorded',data.signedDate);
- const rows=[
-  ['2025',data.rate2025,data.rateSource2025],
-  ['2026',data.rate2026,data.rateSource2026],
-  ['2027 offered',data.rate2027,'Current account record']
- ];
- for(const [year,rate,source] of rows){line(year+'  |  '+money(rate)+(source?'  |  '+source:''));}
- const extra=(data.history||[]).filter(h=>h.year&&h.rate!=null&&!([2025,2026].includes(Number(h.year))&&Math.round(Number(h.rate)*100)===data['rate'+h.year]));
- if(extra.length){line('Other historical records (may differ from the summary above):',9,true);
- for(const h of [...extra].sort((a,b)=>Number(a.year)-Number(b.year)))line(h.year+(h.through2027?'-2027':'')+'  |  '+money(Math.round(Number(h.rate)*100))+'  |  '+(h.kind||'Record')+(h.source?' - '+h.source:''),9);}
- const textHistory=(data.history||[]).filter(h=>h.rate==null&&h.rateText);
- for(const h of textHistory)line(h.year+'  |  '+h.rateText+(h.source?'  |  '+h.source:''),9);
- if(data.reviewNotes?.length)line('Source review: '+data.reviewNotes.join(' '),9);
+ section('ANNUAL RATE & RENEWAL LOG');
+ const years=[...new Set([2025,2026,2027,2028,2029,2030,2031,2032,...(data.history||[]).map(h=>Number(h.year)).filter(n=>Number.isInteger(n)&&n>=2000&&n<=2032)])].sort((a,b)=>a-b);
+ const widths=[40,64,77,43,43,43,206],xs=[48];for(const w of widths)xs.push(xs.at(-1)+w);
+ function tableRow(values,header=false){
+  const h=header?30:25;space(h+5);const top=y+9,bottom=top-h;
+  if(header)ops.push('0.94 g 48 '+bottom+' 516 '+h+' re f 0 g');
+  ops.push('0.6 G 0.45 w');for(const x of xs)ops.push(x+' '+bottom+' m '+x+' '+top+' l S');
+  for(const yy of [bottom,top])ops.push('48 '+yy+' m 564 '+yy+' l S');ops.push('0 G');
+  const original=y;
+  values.forEach((v,i)=>{const parts=String(v??'').split('\n');parts.forEach((p,j)=>{y=original-j*9;text(p,xs[i]+4,header?7.5:9,header);});});
+  y=bottom-9;
+ }
+ const headings=['Year','Nightly rate','Signed date','Rate\nloaded','CC auth','Link\nsent','Notes / changes'];
+ tableRow(headings,true);
+ for(const year of years){
+  const records=(data.history||[]).filter(h=>Number(h.year)===year);
+  const knownRates=[...new Set(records.filter(h=>h.rate!=null).map(h=>Math.round(Number(h.rate)*100)))];
+  let amount=data['rate'+year],note='';
+  if(year===2027)note=data.status==='signed'?'Signed status recorded':'Offered rate; '+(statusLabels[data.status]||'Not started');
+  if(amount==null&&knownRates.length===1)amount=knownRates[0];
+  if(amount==null&&knownRates.length>1)note='Conflicting source rates - review';
+  const rateTexts=[...new Set(records.map(h=>h.rateText).filter(Boolean))];if(rateTexts.length)note+=(note?'; ':'')+rateTexts.join('; ');
+  // Details continue below when too long for handwriting space.
+  if(note.length>35)note=note.slice(0,32)+'...';
+  if(y<95){footer();line('ANNUAL RATE & RENEWAL LOG - CONTINUED',11,true);tableRow(headings,true);}
+  tableRow([String(year),amount==null?'':money(amount),year===2027?data.signedDate||'':'','','','',note]);
+ }
+ tableRow(['','','','','','','']);tableRow(['','','','','','','']);
+ line('Blank cells are for annual updates. Verify both signatures, rate loading, CC authorization',8);
+ line('and booking link delivery before marking the corresponding column. Use N/A when applicable.',8);
  section('BILLING & RESERVATIONS');
  field('Billing',({individual:'Individual traveler pays',company_room_tax:'Company credit card - Room & Tax',company_all:'Company credit card - All charges'})[data.billing||'individual']);
  field('Breakfast',((data.breakfast||(/breakfast included/i.test(data.additionalRate||'')?'included':'not_included'))==='included')?'Included in room rate':'Not included');
  field('Availability',data.availability||'Not recorded');if(data.additionalRate)field('Additional rate terms',data.additionalRate);
  line('Reservations:  Booking link ______   Email direct ______   Other ______');
- section('PAPER FILE CHECKLIST');
- for(const s of ['Signed contract with company and DOS signatures','Company credit card authorization on file (if applicable)','Rate code confirmed / rate loaded','Cluster code confirmed','Booking link sent']){space(22);ops.push('0 G 48 '+(y-1)+' 9 9 re S');text(s,65,10);y-=21;}
- line('Check each item after verification; contract status does not confirm both signatures.',8);
+ section('CONTACT / TERMS CHANGES');
+ for(let i=0;i<2;i++){space(22);ops.push('0.7 G 48 '+(y-8)+' m 564 '+(y-8)+' l S 0 G');y-=22;}
  if(data.notes){section('INTERNAL NOTES');for(const s of clean(data.notes).split('\n'))line(s,9);}
- space(35);y-=12;line('Verified by: _______________________    Date: __________________',9);
  footer();
  const objects=['','<< /Type /Catalog /Pages 2 0 R >>','', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'];
  const kids=[];for(const content of pages){const id=objects.length;objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F 3 0 R /B 4 0 R >> >> /Contents '+(id+1)+' 0 R >>');objects.push('<< /Length '+content.length+' >>\nstream\n'+content+'\nendstream');kids.push(id+' 0 R');}
