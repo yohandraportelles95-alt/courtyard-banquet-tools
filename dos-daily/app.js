@@ -1,5 +1,5 @@
 import {initProfit} from './profit.js?v=profit1';
-import {initLnr} from './lnr.js?v=sheet3';
+import {initLnr} from './lnr.js?v=rename1';
 import {readWorkbook,dateCell} from './xlsx.js?v=icons2';
 import {API_URL} from './config.js';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
