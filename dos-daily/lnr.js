@@ -1,3 +1,4 @@
+import {downloadAccountSheet} from './lnr-account-sheet.js?v=sheet1';
 import {buildContractPdf,downloadContract} from './lnr-pdf.js?v=transparent1';
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -41,17 +42,17 @@ export function initLnr({api,toast,sessionKey,onSignout}){
   document.querySelectorAll('[data-version]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{downloadContract(history.versions.find(v=>v.id===b.dataset.version).details,await template());}catch(e){$('#lnr-error').textContent=e.message;}finally{b.disabled=false;}});
  }
  function payload(){const body=Object.fromEntries(new FormData(form));for(const key of ['rate2027','proposed2027'])body[key]=body[key]===''?null:Math.round(Number(body[key])*100);return {...body,id:selected.id,revision:selected.revision};}
- async function save(generate=false){
-  if(busy||!form.reportValidity())return;const body=payload();$('#lnr-error').textContent='';busy=true;$('#lnr-save').disabled=true;$('#lnr-generate').disabled=true;
+ async function save(generate=false,accountSheet=false){
+  if(busy||!form.reportValidity())return;const body=payload();$('#lnr-error').textContent='';busy=true;$('#lnr-save').disabled=true;$('#lnr-generate').disabled=true;$('#lnr-account-sheet').disabled=true;
   try{
    let m;if(generate){if(!body.rate2027||!body.contactName)throw Error('Enter the 2027 rate and contact name.');m=await template();buildContractPdf({...selected,...body},m);}
    const result=await api(`lnr/accounts/${selected.id}/${generate?'generate':'save'}`,'POST',body);selected=result;accounts=accounts.map(a=>a.id===result.id?result:a);render();
-   if(generate)downloadContract(result,m);$('#lnr-detail').close();toast(generate?'Contract downloaded and saved as a version.':'Account saved.');
-  }catch(e){$('#lnr-error').textContent=e.message;}finally{busy=false;$('#lnr-save').disabled=false;$('#lnr-generate').disabled=false;}
+   if(accountSheet)downloadAccountSheet(result);if(generate)downloadContract(result,m);$('#lnr-detail').close();toast(accountSheet?'Account saved and file sheet downloaded.':generate?'Contract downloaded and saved as a version.':'Account saved.');
+  }catch(e){$('#lnr-error').textContent=e.message;}finally{busy=false;$('#lnr-save').disabled=false;$('#lnr-generate').disabled=false;$('#lnr-account-sheet').disabled=false;}
  }
  $('#lnr-login').onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const result=await api('login','POST',{password:new FormData(e.target).get('password')});sessionStorage.setItem(sessionKey,result.token);e.target.reset();await refresh();}catch(e){$('#lnr-message').textContent=e.message;}finally{b.disabled=false;}};
  $('#lnr-signout').onclick=onSignout;$('#lnr-refresh').onclick=refresh;for(const s of ['#lnr-search','#lnr-type','#lnr-status','#lnr-availability'])$(s).addEventListener(s==='#lnr-search'?'input':'change',render);
- form.onsubmit=e=>{e.preventDefault();save(false);};$('#lnr-generate').onclick=()=>save(true);form.elements.status.onchange=updateStateFields;form.elements.management.onchange=updateStateFields;
+ form.onsubmit=e=>{e.preventDefault();save(false);};$('#lnr-generate').onclick=()=>save(true);$('#lnr-account-sheet').onclick=()=>save(false,true);form.elements.status.onchange=updateStateFields;form.elements.management.onchange=updateStateFields;
  $('#lnr-new').onclick=()=>{$('#lnr-new-form').reset();$('#lnr-new-error').textContent='';$('#lnr-new-dialog').showModal();};
  $('#lnr-new-form').onsubmit=async e=>{e.preventDefault();e.submitter.disabled=true;try{const a=await api('lnr/accounts','POST',{company:new FormData(e.target).get('company')});accounts.push(a);render();$('#lnr-new-dialog').close();await open(a.id);}catch(e){$('#lnr-new-error').textContent=e.message;}finally{e.submitter.disabled=false;}};
  $('#lnr-export').onclick=()=>{const keys=['company','management','availability','contactName','contactEmail','contactPhone','clusterCode','breakfast','billing','rate2025','rate2026','proposed2027','rate2027','status','sentDate','signedDate','notes'];const cell=v=>'"'+String(v??'').replace(/^[=+@\-\t\r]/,"'$&").replaceAll('"','""')+'"';const rows=[keys,...accounts.map(a=>keys.map(k=>['rate2025','rate2026','proposed2027','rate2027'].includes(k)?a[k]==null?'':(a[k]/100).toFixed(2):a[k]))];const url=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(cell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='2027-negotiated-accounts.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
