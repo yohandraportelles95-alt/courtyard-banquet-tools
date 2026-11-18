@@ -2,6 +2,7 @@ import {initProfit} from './profit.js?v=profit1';
 import {initLnr} from './lnr.js?v=rename1';
 import {readWorkbook,dateCell} from './xlsx.js?v=icons2';
 import {API_URL} from './config.js';
+import {certificateLogo, downloadCertificatePdf} from './certificate-pdf.js?v=1';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
@@ -41,7 +42,7 @@ function route(){const name=location.hash.slice(1)||'home';const target=['home',
 addEventListener('hashchange',route);route();
 $('#login').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{const result=await api('login','POST',{password:new FormData(e.target).get('password')});sessionStorage.setItem(sessionKey,result.token);e.target.reset();await refresh();}catch(error){$('#connection').textContent=error.message;}finally{button.disabled=false;}};
 $('#setup-form').onsubmit=async e=>{e.preventDefault();const form=e.target,button=e.submitter;button.disabled=true;try{const password=form.elements.password.value;if(password!==form.elements.confirmPassword.value)throw Error('The passwords do not match.');const result=await api('setup','POST',{setupToken,password});sessionStorage.setItem(sessionKey,result.token);sessionStorage.removeItem('carrollton-sales-setup');setupToken='';form.reset();await refresh();toast('Your private tracker is ready to import the log.');}catch(error){$('#connection').textContent=error.message;}finally{button.disabled=false;}};
-$('#signout').onclick=async()=>{try{await api('logout','POST',{});}finally{sessionStorage.removeItem(sessionKey);lnr.clear();profit.clear();rows=[];legacyRows=[];selected=null;settings=null;$$('dialog[open]').forEach(d=>d.close());$('#print-area').innerHTML='';render();renderLegacy();await refresh();}};
+$('#signout').onclick=async()=>{try{await api('logout','POST',{});}finally{sessionStorage.removeItem(sessionKey);lnr.clear();profit.clear();rows=[];legacyRows=[];selected=null;settings=null;$$('dialog[open]').forEach(d=>d.close());render();renderLegacy();await refresh();}};
 $('#refresh').onclick=refresh;
 function render(){
  const counts={available:0,redeemed:0,expired:0};for(const row of rows)if(status(row) in counts)counts[status(row)]++;
@@ -65,7 +66,7 @@ $('#new-certificate').onclick=()=>{
  requestKey=crypto.randomUUID();
  const form=$('#issue-form');form.reset();form.elements.issuedDate.value=settings.today;const d=new Date(settings.today+'T12:00:00');d.setFullYear(d.getFullYear()+1);form.elements.expires.value=d.toISOString().slice(0,10);form.elements.terms.value=settings.terms;$('#issue-error').textContent='';$('#editor').showModal();
 };
-function certificate(row,draft=false){return`<article class="certificate">${draft?'<div class="draft-stamp">DRAFT \u00b7 NOT VALID FOR REDEMPTION</div>':''}<div class="cert-brand">COURTYARD</div><div class="cert-property">DALLAS CARROLLTON &amp; CONFERENCE CENTER</div><h3>Gift Certificate</h3><div class="cert-benefit">${esc(row.benefit)}</div><dl><dt>Certificate number</dt><dd><strong>${draft?'Assigned when saved':esc(row.number)}</strong></dd>${row.recipient?`<dt>Recipient</dt><dd>${esc(row.recipient)}</dd>`:''}${row.organization?`<dt>Organization</dt><dd>${esc(row.organization)}</dd>`:''}<dt>Expiration date</dt><dd>${displayDate(row.expires)}</dd><dt>Issued by</dt><dd>${esc(row.issuedBy||'Not recorded')}</dd></dl><div class="cert-terms"><strong>Terms &amp; Conditions</strong>\n${esc(row.terms)}</div><div class="cert-address">1201 Raiford Road, Carrollton, TX 75007 \u00b7 972 446 0001</div></article>`;}
+function certificate(row,draft=false){return`<article class="certificate">${draft?'<div class="draft-stamp">DRAFT \u00b7 NOT VALID FOR REDEMPTION</div>':''}<img class="cert-brand" src="${certificateLogo}" alt="Courtyard by Marriott"><div class="cert-property">DALLAS CARROLLTON &amp; CONFERENCE CENTER</div><h3>Gift Certificate</h3><div class="cert-benefit">${esc(row.benefit)}</div><dl><dt>Certificate number</dt><dd><strong>${draft?'Assigned when saved':esc(row.number)}</strong></dd>${row.recipient?`<dt>Recipient</dt><dd>${esc(row.recipient)}</dd>`:''}${row.organization?`<dt>Organization</dt><dd>${esc(row.organization)}</dd>`:''}<dt>Expiration date</dt><dd>${displayDate(row.expires)}</dd><dt>Issued by</dt><dd>${esc(row.issuedBy||'Not recorded')}</dd></dl><div class="cert-terms"><strong>Terms &amp; Conditions</strong>\n${esc(row.terms)}</div><div class="cert-address">1201 Raiford Road, Carrollton, TX 75007 \u00b7 972 446 0001</div></article>`;}
 $('#preview-draft').onclick=()=>{if(!$('#issue-form').reportValidity())return;$('#draft-preview').innerHTML=certificate(formData($('#issue-form')),true);$('#preview-dialog').showModal();};
 $('#issue-form').onsubmit=async e=>{
  e.preventDefault();if(busy)return;busy=true;e.submitter.disabled=true;
@@ -82,10 +83,15 @@ async function openDetail(id){
  const detailId=selected.id;
  try{const events=await api(`certificates/${id}/history`);if(selected?.id!==detailId)return;$('#history').innerHTML='<strong>Record history</strong>'+events.map(e=>`<p>${esc(new Date(e.at).toLocaleString())} \u00b7 ${esc(e.action.replaceAll('_',' '))}${e.action==='voided'?': '+esc(JSON.parse(e.details).reason):''}</p>`).join('');}catch{$('#history').textContent='History could not be loaded. Refresh to try again.';}
 }
-$('#print').onclick=()=>{
- if(!selected || selected.state!=='issued'||!selected.expires)return;
- $('#print-area').innerHTML=certificate(selected);const previous=document.title;document.title=`Gift_Certificate_${selected.number}`;
- window.print();document.title=previous;
+$('#print').onclick=async()=>{
+ const row=selected;
+ if(!row || row.state!=='issued'||!row.expires)return;
+ const button=$('#print');
+ button.disabled=true;
+ button.textContent='Preparing PDF…';
+ try{await downloadCertificatePdf(row,displayDate(row.expires));}
+ catch{toast('The PDF could not be prepared. Please try again.');}
+ finally{button.textContent='Download PDF';button.disabled=!selected||selected.state!=='issued'||!selected.expires;}
 };
 $('#redeem-open').onclick=()=>{$('#redeem-form').reset();$('#redeem-form').elements.redeemedDate.value=settings.today;$('#redeem-form').hidden=false;$('#void-form').hidden=true;$('#redeem-form').scrollIntoView({behavior:'smooth',block:'end'});};
 $('#void-open').onclick=()=>{$('#void-form').reset();$('#void-form').hidden=false;$('#redeem-form').hidden=true;};
