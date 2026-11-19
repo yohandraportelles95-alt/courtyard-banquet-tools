@@ -10,11 +10,36 @@
 .tool-switch{display:flex;gap:8px;margin:0 0 18px}.tool-switch button{font-weight:700}.tool-switch .active{background:#244b78;color:#fff;border-color:#244b78}.beo-grid{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-top:16px}.beo-result{margin-top:12px}.beo-result a{display:inline-block;margin-top:8px}.mini{font-size:12px;color:#65758a}.beo-card{background:#fff;border:1px solid #dbe2ea;border-radius:12px;padding:22px;margin-bottom:18px}.beo-card h1{margin:0 0 7px;font-size:28px}.beo-card h2{margin:0 0 6px;font-size:20px}.beo-card p{margin:5px 0;color:#607086}.section-title{font-weight:700;font-size:12px;color:#244b78;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 @media(max-width:850px){.upload,.beo-grid{grid-template-columns:1fr}.group{min-width:190px}main{padding:12px}header{padding:14px}}
 @media print{@page{size:letter landscape;margin:0.25in}body{background:#fff}.screen-only,header,.hero,.controls,.stats,details,dialog{display:none!important}.print-only{display:block}.print-page{page-break-after:always}.print-page:last-child{page-break-after:auto}.print-page h2{font-size:13px;margin:0 0 3px}.print-page p{font-size:8px;margin:0 0 5px}.print-table{font-size:7.2px;width:100%;table-layout:fixed}.print-table th,.print-table td{padding:2.4px 2px;border:1px solid #d6dce4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.print-table .pg{text-align:left;width:22%;white-space:normal}.print-table th{position:static;background:#263f60!important;color:#fff}.print-table .pms{background:#edf4fb!important}.print-table .diff{background:#fde9e7!important;color:#8c2924}.print-table .total td{background:#dce8f3!important}.print-table small{font-size:6.2px;display:block}.print-all-only{display:block}}
+.beo-revision{margin-top:14px;padding:12px;border:1px solid #dbe2ea;border-radius:9px}
+.beo-revision-toggle{display:inline-flex;gap:8px;align-items:center;font-weight:600}
+.beo-revision-fields{margin-top:10px}
+.beo-revision-fields input{width:75px;margin-left:6px;padding:5px;border:1px solid #aebccd;border-radius:5px}
+.beo-revision-fields p{margin-top:7px}
+.beo-revision-preview{color:#ad252d;font-weight:700}
 </style></head><body>
-<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-10-12b</span></div><a href="index.html" style="color:#244b78">← Banquet Tools</a></header>
+<header><div><b>Courtyard Carrollton</b><br><span>STS Meeting Tools · BEO Cleaner + Group Pickup Comparison · build 2026-11-19</span></div><a href="index.html" style="color:#244b78">← Banquet Tools</a></header>
 <main>
 <div class="tool-switch screen-only"><button id="showBeo" class="active">BEO Cleaner</button><button id="showPickup">STS ↔ Stay PMS Comparison</button></div>
-<section id="beoTool" class="beo-card screen-only"><div class="section-title">BEO CLEANER</div><h1>Clean STS BEO PDF</h1><p>Remove the standard STS legal acknowledgment, tax disclaimer, and Sertifi signature/date footer from an unsigned BEO PDF while keeping event details, charges, totals, and page order.</p><div class="beo-grid"><label class="filebox"><b>Choose unsigned STS BEO PDF</b><input id="beoFile" type="file" accept=".pdf,application/pdf"></label><button class="primary" id="cleanBeo">Clean BEO</button></div><div class="privacy">The PDF is processed in this browser. The original file is never changed. Review the cleaned copy before sending it to the client.</div><div id="beoMsg" class="beo-result"></div></section>
+<section id="beoTool" class="beo-card screen-only">
+<div class="section-title">BEO CLEANER</div>
+<h1>Clean STS BEO PDF</h1>
+<p>Remove the standard STS legal acknowledgment, tax disclaimer, and Sertifi signature/date footer from an unsigned BEO PDF while keeping event details, charges, totals, and page order.</p>
+<div class="beo-grid">
+  <label class="filebox"><b>Choose unsigned STS BEO PDF</b><input id="beoFile" type="file" accept=".pdf,application/pdf"></label>
+  <button class="primary" id="cleanBeo">Clean BEO</button>
+</div>
+<div class="beo-revision">
+  <label class="beo-revision-toggle"><input id="beoRevised" type="checkbox" aria-controls="beoRevisionFields" autocomplete="off"> Mark as a revised BEO</label>
+  <div id="beoRevisionFields" class="beo-revision-fields" hidden>
+    <label for="beoRevisionNumber">Revision #</label>
+    <input id="beoRevisionNumber" type="number" min="1" max="999" step="1" value="1" required aria-describedby="beoRevisionHint" autocomplete="off">
+    <p id="beoRevisionHint" class="mini">Use a fresh STS export. Choose 1 for the first update, then use the next number after the last version you sent. For a batch, use this option when every BEO in the PDF has the same revision number.</p>
+    <div id="beoRevisionPreview" class="beo-revision-preview" aria-live="polite"></div>
+  </div>
+</div>
+<div class="privacy">The PDF is processed in this browser. The original file is never changed. Review the cleaned copy before sharing it.</div>
+<div id="beoMsg" class="beo-result" role="status"></div>
+</section>
 <section id="pickupTool" class="hero screen-only hidden"><h1>Group Pickup Scrub</h1><p>Upload the current STS GRC Excel and Stay PMS Group Rooms Control CSV. Nothing is uploaded to a server; the files are processed in this browser.</p>
 <div class="upload"><label class="filebox"><b>1. STS GRC Excel</b><input id="stsFile" type="file" accept=".xlsx,.xls"></label><label class="filebox"><b>2. Stay PMS Group Rooms Control CSV</b><input id="pmsFile" type="file" accept=".csv"></label><button class="primary" id="generate">Generate comparison</button></div><div class="privacy">Tip for Tania: download both reports, open this page, choose the two files, and click <b>Generate comparison</b>.</div><div id="uploadMsg"></div></section>
 <section id="app" class="hidden screen-only">
@@ -51,7 +76,61 @@ tax, while all other taxable items are subject to an 8.25% state and local sales
 };
 function beoNorm(s){return String(s||'').replace(/\s+/g,'').toLowerCase()}
 function itemRect(item,pageHeight){const t=item.transform||[1,0,0,1,0,0],x=t[4]||0,y=t[5]||0,h=Math.max(Math.abs(t[3]||0),item.height||8,7),w=Math.max(item.width||0,2);return {x:x-1,y:Math.max(0,y-h-1),w:w+2,h:h+3,top:pageHeight-(y+2),bottom:pageHeight-(y-h-2)}}
-async function cleanBeoPdf(file){
+const beoRevisionDateFormat=new Intl.DateTimeFormat('en-CA',{
+ timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit'
+});
+function beoRevisionDetails(input){
+ const number=String(input.valueAsNumber).padStart(2,'0');
+ const parts=beoRevisionDateFormat.formatToParts(new Date());
+ const date=['year','month','day'].map(type=>parts.find(part=>part.type===type).value).join('-');
+ return {label:`REVISED BEO | REV ${number} | ${date}`,filePrefix:`REVISED BEO - Rev ${number} - ${date} - `};
+}
+
+async function stampBeoRevision(doc,revision){
+ const {StandardFonts,degrees,rgb}=PDFLib;
+ const font=await doc.embedFont(StandardFonts.HelveticaBold);
+ const bandHeight=28;
+ const red=rgb(.66,.12,.16);
+ const tint=rgb(1,.95,.95);
+ for(const page of doc.getPages()){
+  const crop=page.getCropBox();
+  const media=page.getMediaBox();
+  const right=crop.x+crop.width;
+  const top=crop.y+crop.height;
+  const angle=((page.getRotation().angle%360)+360)%360;
+  // PDF coordinates rotate with the page. Start at the visible top-left edge
+  // and extend the crop box outward so the stamp never covers event content.
+  const edge={
+   0:{x:crop.x,y:top,width:crop.width,dx:1,dy:0},
+   90:{x:crop.x,y:crop.y,width:crop.height,dx:0,dy:1},
+   180:{x:right,y:crop.y,width:crop.width,dx:-1,dy:0},
+   270:{x:right,y:top,width:crop.height,dx:0,dy:-1}
+  }[angle];
+  const next={
+   x:crop.x-(angle===90?bandHeight:0),
+   y:crop.y-(angle===180?bandHeight:0),
+   width:crop.width+(angle%180===90?bandHeight:0),
+   height:crop.height+(angle%180===0?bandHeight:0)
+  };
+  const mediaX=Math.min(media.x,next.x);
+  const mediaY=Math.min(media.y,next.y);
+  page.setMediaBox(mediaX,mediaY,Math.max(media.x+media.width,next.x+next.width)-mediaX,
+   Math.max(media.y+media.height,next.y+next.height)-mediaY);
+  page.setCropBox(next.x,next.y,next.width,next.height);
+  const rotate=degrees(angle);
+  page.drawRectangle({x:edge.x,y:edge.y,width:edge.width,height:bandHeight,rotate,color:tint});
+  const pad=Math.min(14,edge.width*.08);
+  const size=Math.min(12,(edge.width-2*pad)/font.widthOfTextAtSize(revision.label,1));
+  const baseline=(bandHeight-size)/2+2;
+  page.drawText(revision.label,{
+   x:edge.x+edge.dx*pad-edge.dy*baseline,
+   y:edge.y+edge.dy*pad+edge.dx*baseline,
+   size,font,rotate,color:red
+  });
+ }
+}
+
+async function cleanBeoPdf(file,revision){
  // Read the File twice so PDF.js and PDF-Lib receive completely independent ArrayBuffers.
  // This avoids transferred/detached buffers on large STS batch PDFs in Chromium.
  const libBuffer=await file.arrayBuffer();
@@ -71,6 +150,10 @@ async function cleanBeoPdf(file){
  let legalHits=0,taxHits=0,sigBlocks=0,changed=new Set(),warnings=[],removePages=[];
  for(let pn=1;pn<=src.numPages;pn++){
   const pg=await src.getPage(pn),tc=await pg.getTextContent(),items=tc.items.filter(x=>x.str&&x.str.trim()),ph=pg.getViewport({scale:1}).height;
+
+  if(revision && items.some(item=>/^REVISED BEO\s*\|\s*REV \d+\s*\|/.test(item.str))){
+   throw Error('This PDF already has a revision stamp. Choose a fresh export from STS.');
+  }
 
   // STS sometimes emits a completely empty overflow page that contains only
   // the Courtyard logo as an image. It has no extractable text at all, so the
@@ -148,12 +231,57 @@ async function cleanBeoPdf(file){
  }
  // Remove footer-only pages from the end backward so original page indexes stay valid.
  removePages.sort((a,b)=>b-a).forEach(i=>out.removePage(i));
+ if(revision){
+  if(!out.getPageCount())throw Error('No BEO pages remained after cleaning.');
+  await stampBeoRevision(out,revision);
+ }
  const data=await out.save();return {data,report:{input_pages:src.numPages,output_pages:out.getPageCount(),removed_pages:removePages.map(i=>i+1).sort((a,b)=>a-b),matches:{legal:legalHits,tax:taxHits,signature_blocks:sigBlocks},changed_pages:[...changed],warnings}};
 }
 function beoDownload(bytes,name){const a=document.createElement('a'),u=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}
 function setTool(which){const beo=which==='beo';document.getElementById('beoTool').classList.toggle('hidden',!beo);document.getElementById('pickupTool').classList.toggle('hidden',beo);document.getElementById('app').classList.toggle('hidden',beo||!D);document.getElementById('showBeo').classList.toggle('active',beo);document.getElementById('showPickup').classList.toggle('active',!beo)}
 document.getElementById('showBeo').onclick=()=>setTool('beo');document.getElementById('showPickup').onclick=()=>setTool('pickup');
-document.getElementById('cleanBeo').onclick=async()=>{const f=document.getElementById('beoFile').files[0],m=document.getElementById('beoMsg');if(!f){m.innerHTML='<div class="notice danger">Choose an STS BEO PDF first.</div>';return}try{document.getElementById('cleanBeo').disabled=true;m.innerHTML='<div class="notice">Cleaning and checking the PDF…</div>';const r=await cleanBeoPdf(f),base=f.name.replace(/\.pdf$/i,'');beoDownload(r.data,base+' - Cleaned.pdf');const x=r.report.matches;m.innerHTML=`<div class="notice ok"><b>Cleaned PDF ready.</b><br>${r.report.changed_pages.length} page(s) cleaned · ${r.report.removed_pages?.length||0} blank/footer-only page(s) removed · ${x.legal} legal acknowledgment(s) removed · ${x.tax} tax disclaimer(s) removed · ${x.signature_blocks} signature/footer block(s) removed.${r.report.warnings.length?'<br><span class="mini">'+r.report.warnings.map(esc).join('<br>')+'</span>':''}</div>`}catch(e){m.innerHTML='<div class="notice danger"><b>Could not clean this PDF:</b> '+esc(e.message)+'</div>'}finally{document.getElementById('cleanBeo').disabled=false}};
+const beoFileInput=document.getElementById('beoFile');
+const beoCleanButton=document.getElementById('cleanBeo');
+const beoRevised=document.getElementById('beoRevised');
+const beoRevisionNumber=document.getElementById('beoRevisionNumber');
+const beoRevisionFields=document.getElementById('beoRevisionFields');
+const beoRevisionPreview=document.getElementById('beoRevisionPreview');
+function syncBeoRevision(){
+ beoRevisionFields.hidden=!beoRevised.checked;
+ beoCleanButton.textContent=beoRevised.checked?'Clean & Stamp BEO':'Clean BEO';
+ beoRevisionPreview.textContent=beoRevised.checked&&beoRevisionNumber.validity.valid
+  ?beoRevisionDetails(beoRevisionNumber).label:'';
+}
+beoRevised.addEventListener('change',syncBeoRevision);
+beoRevisionNumber.addEventListener('input',syncBeoRevision);
+syncBeoRevision();
+
+beoCleanButton.onclick=async()=>{
+ const file=beoFileInput.files[0];
+ const message=document.getElementById('beoMsg');
+ if(!file){
+  message.innerHTML='<div class="notice danger">Choose an STS BEO PDF first.</div>';
+  return;
+ }
+ if(beoRevised.checked&&!beoRevisionNumber.reportValidity())return;
+ const revision=beoRevised.checked?beoRevisionDetails(beoRevisionNumber):null;
+ const controls=[beoFileInput,beoCleanButton,beoRevised,beoRevisionNumber];
+ controls.forEach(control=>control.disabled=true);
+ try{
+  message.innerHTML='<div class="notice">Cleaning and checking the PDF…</div>';
+  const {data,report}=await cleanBeoPdf(file,revision);
+  const base=file.name.replace(/\.pdf$/i,'');
+  const name=revision?revision.filePrefix+base+'.pdf':base+' - Cleaned.pdf';
+  beoDownload(data,name);
+  const {legal,tax,signature_blocks}=report.matches;
+  const ready=revision?esc(revision.label)+' is stamped on every page.':'Cleaned PDF ready.';
+  message.innerHTML=`<div class="notice ok"><b>${ready}</b><br>${report.changed_pages.length} page(s) cleaned · ${report.removed_pages.length} blank/footer-only page(s) removed · ${legal} legal acknowledgment(s) removed · ${tax} tax disclaimer(s) removed · ${signature_blocks} signature/footer block(s) removed.${report.warnings.length?'<br><span class="mini">'+report.warnings.map(esc).join('<br>')+'</span>':''}</div>`;
+ }catch(error){
+  message.innerHTML='<div class="notice danger"><b>Could not clean this PDF:</b> '+esc(error.message)+'</div>';
+ }finally{
+  controls.forEach(control=>control.disabled=false);
+ }
+};
 
 const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), fmt=n=>n==null?'—':Number(n).toLocaleString('en-US');
 let D=null,P=null,state=null,initialLinks={},currentFingerprint='';
